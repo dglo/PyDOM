@@ -1,0 +1,117 @@
+#!/usr/bin/env python
+import icecube.domtest.ibidaq as daq
+import sys, time, string
+from getopt import getopt
+
+DEBUG	= 0
+hv   = -1 
+nevt = 100
+ncyc = 1
+mode = 'spe'
+qfmt = 0x107
+muxset   = 'ledmux'
+# Rev 2 DACs
+dacs2     = [  850, 2097, 3000, 2048,
+	       850, 2097, 3000, 1925, 
+	         0,  550,    0,  700,
+	         0,  500,  800,    0  ]
+
+# Rev 3/4 DACs
+dacs     = [  850, 2097, 3000, 2048,
+	      850, 2097, 3000, 1925, 
+	        0,  535,  700,    0,
+	        0,  800,    0,    0  ]
+
+def usage():
+	print """
+The PyDOM Data Acq script version 1.3c by Kael Hanson <kaeld@amanda.wisc.edu>
+
+usage: tdaq [ options ] <hostname> <port> <filename-pattern>
+options are ....
+	-V <HV>		Set HV to HV
+	-n <#>		Specify #/samples per sequenced capture
+	-c <#>		Specify #/sequences
+	-p		Take forced-trigger data
+	-s		Take spe-discriminator-trigger (default)
+	-f <hex-fmt>	Acquisition readout format bits (HEXADECIMAL)
+	-b <FE bias>    Set DOM FE bias DAC
+	-t <spe-trlvl>  Set SPE trigger DAC level
+	--debug		Set debugging level
+	--led		Set analog Mux to LED
+	--clock1x	Set analog Mux to 1x Clock
+	--clock2x	Set analog Mux to 2x Clock
+arguments are ....
+	<hostname>	IP address of host
+	<port>		port
+	<filename-pattern>
+			sprintf()-style pattern /w/ %s replaced by DOM ID
+			
+Example usage:
+Take 10 cycles of 100 fast sequenced captures of SPE triggers with
+discriminator threshold set to 650, and the HV set to 1750 Volts;
+readout only ATWD-B channel 0 and the FADC.  Save to a file named
+DOMdata-00013c6271bd.dat (assume that the DOM id is 00013c6271bd):
+
+tdaq -s -t 650 -c 10 -n 100 -V 3500 -f 110 domhub.ic3.org 2121 DOMdata-%s.dat
+
+"""
+
+opts, args = getopt(sys.argv[1:], 'V:n:c:hpsf:b:t:',
+			[ 'help', 'debug=', 'led', 'clock1x', 'clock2x' ] 
+			)
+for o, a in opts:
+	if o == '-V':
+		hv = int(a)
+	elif o == '-h' or o == '--help':
+		usage()
+		sys.exit(1)
+	elif o == '--debug':
+		DEBUG = int(a)
+	elif o == '-n':
+		nevt = int(a)
+	elif o =='-c':
+		ncyc = int(a)
+	elif o == '-p':
+		mode = 'cpu'
+	elif o == '-s':
+		mode = 'spe'
+	elif o == '-f':
+		qfmt = int(a, 16)
+	elif o == '-b':
+		dacs[7] = int(a)
+	elif o == '-t':
+		dacs[9] = int(a)
+	elif o == '--led':
+		muxset = 'ledmux'
+	elif o == '--clock1x':
+		muxset = 'clock1x'
+	elif o == '--clock2x':
+		muxset = 'clock2x'
+
+q = daq.ibx(args.pop(0), int(args.pop(0)))
+
+if DEBUG > 2:
+	sys.stderr.write("Connected to DOM " + q.getId() + "\n")
+	if DEBUG > 100:
+		daq.DEBUG_LEVEL = DEBUG % 10
+	
+q.mux(muxset)
+for i in range(0, 16):
+	q.setDAC(i, dacs[i])
+
+if hv < 0:
+	q.disableHV()
+else:
+	q.enableHV()
+	q.setHV(hv)
+
+time.sleep(5.0)
+f = open(args.pop(0) % (q.getId()), 'wb')
+for icyc in range(0, ncyc):
+	hqx = q.acqX(nevt, qfmt, mode)
+	hqx.pop(0)
+	for h in hqx:
+		f.write(h.toeng())
+f.close()
+q.s.close()
+

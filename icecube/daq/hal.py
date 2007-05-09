@@ -1,0 +1,63 @@
+"""
+This module defines low-level DOM HAL constants
+K. Hanson 12/2005
+"""
+
+######### D/A Converter Channels ##########
+
+# These first 8 DACs are 12-bit
+DAC_ATWD0_TRIGGER_BIAS  = 0
+DAC_ATWD0_RAMP_TOP      = 1
+DAC_ATWD0_RAMP_RATE     = 2
+DAC_ATWD_ANALOG_REF     = 3
+
+DAC_ATWD1_TRIGGER_BIAS  = 4
+DAC_ATWD1_RAMP_TOP      = 5
+DAC_ATWD1_RAMP_RATE     = 6
+DAC_PMT_FE_PEDESTAL     = 7
+
+# These DACs are only 10-bit
+DAC_MULTIPLE_SPE_THRESH = 8
+DAC_SINGLE_SPE_THRESH   = 9
+DAC_FAST_ADC_REF        = 10
+DAC_INTERNAL_PULSER     = 11
+
+DAC_LED_BRIGHTNESS      = 12
+DAC_FE_AMP_LOWER_CLAMP  = 13
+DAC_FL_REF              = 14
+DAC_MUX_BIAS            = 15
+
+
+########## A/D Converter Channels ##########
+
+ADC_VOLTAGE_SUM         = 0
+ADC_5V_POWER_SUPPLY     = 1
+# pressure = 111.11*(ADC_5V_POWER_SUPPLY / ADC_PRESSURE)
+ADC_PRESSURE            = 2
+ADC_3_3V_CURRENT        = 3
+ADC_2_5V_CURRENT        = 4
+ADC_1_8V_CURRENT        = 5
+ADC_MINUS_5V_CURRENT    = 6
+ADC_DISC_SPE            = 7
+ADC_DISC_MPE            = 8
+ADC_FADC_REF            = 9
+ADC_LED_BRIGHTNESS      = 10
+ADC_ATWD0_TRIGGER_BIAS_CURRENT  = 11
+ADC_ATWD0_RAMP_TOP_VOLTAGE      = 12
+ADC_ATWD0_RAMP_BIAS_CURRENT     = 13
+ADC_ATWD_ANALOG_REF     = 14
+ADC_ATWD1_TRIGGER_BIAS_CURRENT  = 15
+ADC_ATWD1_RAMP_TOP_VOLTAGE      = 16
+ADC_ATWD1_RAMP_BIAS_CURRENT     = 17
+ADC_FE_PEDESTAL         = 18
+
+### Multiplexer input channels
+
+MUX_OSC_OUTPUT      = 0
+MUX_40MHZ_SQUARE    = 1
+MUX_PMT_LED_CURRENT = 2
+MUX_FLASHER_CURRENT = 3
+MUX_UPPER_LC        = 4
+MUX_LOWER_LC        = 5
+MUX_COMM_ADC_INPUT  = 6
+MUX_FE_PULSER       = 7

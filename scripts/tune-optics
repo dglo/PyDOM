@@ -1,0 +1,93 @@
+#!/bin/env python
+
+"""
+Tune the optical bench.
+2004-07-17 K. Hanson (kael.hanson@icecube.wisc.edu)
+$Id: tune-optics,v 1.2 2004/07/30 02:29:45 kaeld Exp $
+"""
+
+import sys, time, os
+from icecube.domtest.lightsource import pulser, Digikrom, FilterWheel
+from icecube.domtest.ibidaq import ibx
+from icecube.domtest.dor import Driver
+from icecube.domtest.util import configDefault
+from threading import Thread
+
+class ThreadedQ(Thread):
+
+    def __init__(self, q):
+        Thread.__init__(self)
+        self.rate = 0
+        self.q = q
+
+    def run(self):
+        self.rate = 0
+        for a in range(100):
+            self.rate += self.q.spef()
+            time.sleep(0.12)
+        self.rate *= 0.1
+    
+def rate(qlist):
+    """Get the current rates in the DOMs - averaged over 10 s"""
+    r = { }
+    t = { }
+    for q in qlist:
+        id = q.getId()
+        t[id] = ThreadedQ(q)
+        t[id].start()
+    for id in t.keys():
+        t[id].join()
+        r[id] = t[id].rate
+    return r
+
+def print_rates(r):
+    hdr = ''
+    ids = r.keys()
+    for x in ids:
+        hdr = hdr + x + ' '
+    print hdr
+    txt = '' 
+    for x in ids:
+        txt = txt + ("%12.1f" % (r[x])) + ' '
+    print txt
+    
+drv = Driver()
+drv.discover_doms()
+q = [ ]
+
+for loc in drv.doms.values():
+    devfile = "/dev/dhc%dw%dd%s" % loc
+    qnx = ibx(devfile)
+    q.append(qnx)
+    print "Adding DOM", qnx.getId(), "to run."
+    configDefault(qnx, hvon=1)
+    qnx.setSPEDeadtime(6)
+
+p    = pulser('lantronix', 3010)
+mono = Digikrom('lantronix', 3011)
+fw   = FilterWheel('lantronix', 3012)
+
+fw.reset()
+mono.reset()
+
+baseline = rate(q)
+print_rates(baseline)
+
+for pos in range(1,5):
+    fw.setPosition(pos)
+    time.sleep(5.0)
+    print "Filter Wheel position:", fw.queryPosition()
+
+    p.syncOn()
+    p.setPulseFrequency(10000)
+    time.sleep(0.5)
+    print_rates(rate(q))
+    
+p.allOff()
+
+
+
+
+
+
+            

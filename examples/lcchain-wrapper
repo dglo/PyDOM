@@ -1,0 +1,33 @@
+#!/bin/sh
+
+
+echo
+echo starting lcchain.py at `date`
+echo
+
+cd /mnt/data/testdaq/lcchain
+
+filetime=$(date +%Y-%m-%d-%s)
+
+echo >> lcchain-$filetime.dat
+echo starting lcchain.py at `date` >> lcchain-$filetime.dat
+echo >> lcchain-$filetime.dat
+
+#nohup lcchain.py -h fathub1 -s 001 -e 000 >> lcchain-$filetime.dat
+#nohup lcchain.py -h fathub2 -s 021 -e 730  >> lcchain-$filetime.dat
+#nohup lcchain.py -h fathub5 -s 001 -e 210 >> lcchain-$filetime.dat
+#nohup lcchain.py -h fathub5 -h fathub1 -s 721 -e 730 >>lcchain-$filetime.dat
+#nohup lcchain.py -h fathub1 -s 130 -e 201  >> lcchain-$filetime.dat
+#nohup lcchain.py -d psl  >> lcchain-$filetime.dat
+#nohup lcchain.py -h fathub2 -h fathub1 -s 721 -e 730 >> lcchain-$filetime.dat
+
+# Used for fat 10:
+# nohup lcchain.py -s 021 -e 230 -h domhub2 -h domhub1 -h domhub5 >> lcchain-$filetime.dat
+
+# for FAT11, only fathub1 and fathub2 in reverse order
+nohup lcchain.py -s 001 -e 531 -h fathub1 -h fathub2 >> lcchain-$filetime.dat
+
+
+echo >> lcchain-$filetime.dat
+echo lcchain-wrapper finished at `date`  >> lcchain-$filetime.dat
+echo >> lcchain-$filetime.dat

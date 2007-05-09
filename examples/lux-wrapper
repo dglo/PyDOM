@@ -1,0 +1,25 @@
+#!/bin/sh
+
+
+echo
+echo starting multimon.py and lux.py at `date`
+echo
+
+cd $HOME/monitoring
+
+year=$(date +%Y)
+month=$(date +%m)
+day=$(date +%d)
+mkdir $year
+cd $year
+mkdir $month
+cd $month
+mkdir $day
+cd $day
+
+nohup multimon.py -H sastrugi -S normalFAT -o $HOME/monitoring/$year/$month/$day fathub1 &
+#nohup multimon.py -H sastrugi -S DESY -o $HOME/monitoring/$year/$month/$day fathub1 &
+
+sleep 5
+nohup lux.py -o $HOME/monitoring/$year/$month/$day &
+

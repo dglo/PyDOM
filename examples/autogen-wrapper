@@ -1,0 +1,28 @@
+#!/bin/sh
+
+#
+# switch S is for site, FAT, SPTS, or SPS
+# T is for execution time for all tests
+#
+autogen-steering -H sastrugi -S FAT -T 200 fathub1
+autogen-steering -H sastrugi -S FAT -F Cyclone -T 200 fathub1
+
+#autogen-steering -H sastrugi -S SPTS -T 200 spts-ichub-cont01 spts-ithub-cont01
+#autogen-steering -H sastrugi -S SPS -T 200 sps-ichub-cont01 sps-ichub-cont02 sps-ithub-cont01
+
+for f in GainVsHV-*.xml; 
+do 
+    sed /DAC_SINGLE_SPE_THRESH/s/575/560/ $f > x && mv x $f; 
+done
+#for f in Linearity-*.xml; 
+#do 
+#    sed /DAC_SINGLE_SPE_THRESH/s/575/1000/ $f > x && mv x $f; 
+#done
+
+echo
+echo We just created steering files for
+grep domId LocalCoincidence-ATWD0.xml -c
+echo    DOMS
+echo
+
+
