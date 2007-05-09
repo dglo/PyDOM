@@ -1,0 +1,479 @@
+#!/usr/bin/python
+
+
+"""
+A script to generate the TestDAQ steering files.
+$Id: autogen-steering,v 1.13 2005/11/22 23:14:33 krasberg Exp $
+"""
+
+import sys
+from icecube.domtest.steering import SteeringDeck
+from icecube.domtest.dor import Driver
+from getopt import getopt
+from xmlrpclib import ServerProxy
+#from goto import goto, comefrom, label
+
+host = 'localhost'
+domname = ""
+site = "FAT"
+time = 200
+
+opts, args = getopt(
+    sys.argv[1:], 'H:F:S:T:h', [ 'dbhost=', 'help' ]
+    )
+
+for o, a in opts:
+    if o == '--help' or o == '-h':
+        print >>sys.stderr, """usage :: autogen-steering.py [ -hlst ] <hub-1> [ <hub-2> ... ]
+    -H = <hostname>
+       or
+    --dbhost=<hostname> attach to database on remote host
+"""
+        sys.exit(1)
+    elif o == '-H' or o == '--dbhost':
+        host = a
+    elif o == '-F':
+        domname = a
+    elif o == '-S':
+        site = a
+    elif o == '-T':
+        time = int(a)
+
+hubs = args
+
+if len(hubs) == 0:
+    # local connection
+    d = Driver()
+    d.scan()
+    doms = d.discover_doms()
+else:
+    doms = dict()
+    # go through a remote proxy
+    for h in hubs:
+        d = ServerProxy('http://' + h + ':7501')
+        d.scan()
+        dh = d.discover_doms()
+        for domid, domloc in dh.items():
+            dh[domid] = [ h ] + domloc
+        doms.update(dh)
+
+if (domname == ""):
+#   goto .FlasherStuff
+ if (site == "FAT"):
+  print "starting up TimeResolution..."
+  for atwdChip in (0, 1):
+    for frequency in (15000, 15000):
+        deck = SteeringDeck(host)
+        deck.addTest('Time Resolution Test v1.2 (MK)',
+                     doms,
+                     executionTime=time,
+                     samples=(32, 0, 0, 0),
+                     pulserMode=4,
+                     pulserFreq=frequency,
+                     atwd=atwdChip,
+                     filterWheel=1,
+		     site=site,
+                     )
+        f = file("TimeResolution-ATWD%d-%dHz.xml" % (atwdChip, frequency), "wt")
+        print >>f, deck
+        f.close()
+
+ if (site == "FATnomore"):
+  print "starting up TimeResolution wider ATWD..."
+#  for atwdChip in (0, 1):
+  atwdChip = 0
+#    for frequency in (1500, 15000):
+  frequency = 15000
+  deck = SteeringDeck(host)
+  deck.addTest('Time Resolution Test v1.2 (MK)',
+                     doms,
+                     executionTime=time,
+                     samples=(32, 0, 0, 0),
+                     pulserMode=4,
+                     pulserFreq=frequency,
+                     atwd=atwdChip,
+                     filterWheel=1,
+		     site=site,
+                     )
+  f = file("TimeResolution-Secret-Dont-Tell-Kael-ATWD%d-%dHz.xml" % (atwdChip, frequency), "wt")
+  print >>f, deck
+  f.close()
+
+
+
+# if (site == "FAT"):
+#  print "starting up TimeResolution-LC..."
+#  for atwdChip in (0, 1):
+#   for frequency in (200, 15000):
+#     deck = SteeringDeck(host)
+#     deck.addTest('TimeResolution LC v1.0 (MK)',
+#                 doms,
+#                 executionTime=time,
+#                 samples=(32, 0, 0, 0),
+#                 pulserMode=4,
+#                 pulserFreq=frequency,
+#                 atwd=atwdChip,
+#                 filterWheel=1,
+#                 fadc=0,
+#                 trigMode=2,
+#		 localCoinc=800,
+#		 site=site,
+#                 )
+#     f = file("TimeResolution-LC-ATWD%d-%dHz.xml" % (atwdChip,frequency), "wt")
+#     print >>f, deck
+#     f.close()
+#
+        
+# print "starting up OpticalSensitivity steering file creation..."
+# for wavelen in range(320, 420, 20):
+#    deck = SteeringDeck(host)
+#    deck.addTest('Optical Sensitivity Test v1.0 (KDH)',
+#                 doms,
+#                 executionTime=200,
+#                 samples=(0, 0, 0, 0),
+#                 pulserMode=5,
+#                 pulserFreq=100,
+#                 filterWheel=3,
+#                 monochromatorWavelen=wavelen
+#                 )
+#    f = file("OpticalSensitivity-%d.xml" % (wavelen), "wt")
+#    print >>f, deck
+#    f.close()
+
+ if ((site == "FAT") | (site == "SPTS")):
+  print "starting up Linearity-LC Big Pulse steering file creation..."
+  for filter_pos in range(1,5):
+    deck = SteeringDeck(host)
+    deck.addTest('Non-linearity Test v2.0 (MK)',
+                 doms,
+                 executionTime=time,
+                 samples=(128, 128, 128, 0),
+                 fadc=255,
+                 pulserMode=3,
+                 pulserBrightness=4095,
+                 pulserFreq=25,
+                 filterWheel=filter_pos,
+                 trigMode=2,
+                 localCoinc=800,
+		 site=site,
+                 )
+    f = file("Linearity-LC-BigPulse-Bright%d-FW%d.xml" % (4095,filter_pos), "wt")
+    print >>f, deck
+    f.close()
+
+ if ((site == "FAT") | (site == "SPTS")):
+  print "starting up Linearity-LC Big Pulse FW5 variable brightness steering file creation..."
+  for pulser_brightness in (1024, 2048, 4095):
+    deck = SteeringDeck(host)
+    deck.addTest('Non-linearity Test v2.0 FW5 variable brightness (MK)',
+                 doms,
+                 executionTime=time,
+                 samples=(128, 128, 128, 0),
+                 fadc=255,
+                 pulserMode=3,
+                 pulserBrightness=pulser_brightness,
+                 pulserFreq=25,
+                 filterWheel=5,
+                 trigMode=2,
+                 localCoinc=800,
+		 site=site,
+                 )
+    f = file("Linearity-LC-BigPulse-Bright%d-FW5.xml" % (pulser_brightness), "wt")
+    print >>f, deck
+    f.close()
+
+
+ if ((site == "FAT") | (site == "SPTS")):
+   print "starting up Linearity-LC Standard Pulse steering file creation"
+   for filter_pos in range(1,6):
+    for pulser_brightness in (2048, 4095):
+# for atwdChip in (0, 1):
+     deck = SteeringDeck(host)
+     deck.addTest('LinearityLC v1.0 (MK)',
+                 doms,
+                 executionTime=time,
+                 samples=(128, 128, 128, 0),
+                 fadc=255,
+#                 atwd=atwdChip,
+                 pulserMode=1,
+                 pulserFreq=25,
+		 pulserBrightness=pulser_brightness,
+                 filterWheel=filter_pos,
+                 trigMode=2,
+		 localCoinc=800,
+		 site=site,
+                 )
+#    f = file("LinearityLC-%d-ATWD%d.xml" % (atwdChip), "wt")
+     f = file("Linearity-LC-MarkerPulse-Bright%d-FW%d.xml" % (pulser_brightness,filter_pos), "wt")
+     print >>f, deck
+     f.close()
+
+
+ if (site == "FATnomore"):
+  print "starting up GainVsHV steering file creation..."
+  for hv1 in range(1200, 1900, 100):
+    for atwdChip in (0, 1):
+        deck = SteeringDeck(host)
+        deck.addTest('Gain vs. HV Test v1.0 (KDH)',
+                     doms,
+                     executionTime=time,
+                     samples=(32, 32, 0, 0),
+                     fadc=0,
+                     atwd=atwdChip,
+                     pulserMode=4,
+                     pulserFreq=1000,
+                     filterWheel=1,
+                     commonHV=hv1,
+		     site=site,
+                     )
+        f = file("GainVsHV-%d-ATWD%d.xml" % (hv1, atwdChip), "wt")
+        print >>f, deck
+        f.close()
+
+ if (site == "FATnomore"):
+   print "starting up PedestalPattern steering file creation..."
+   for atwdChip in (0, 1):
+    deck = SteeringDeck(host)
+    deck.addTest('Pedestal Pattern Test v1.0 (KDH)',
+                 doms,
+                 executionTime=time,
+                 samples=(128, 128, 128, 128),
+                 fadc=255,
+                 trigMode=1,
+                 atwd=atwdChip,
+                 pulserMode=0,
+                 pulserFreq=10,
+                 filterWheel=6,
+                 commonHV=0,
+		 site=site,
+                 )
+    f = file("PedestalPattern-ATWD%d.xml" % (atwdChip), "wt")
+    print >>f, deck
+    f.close()
+
+ if (site == "FAT"):
+   print "starting up DarkNoise steering file creation..."
+   for atwdChip in (0, 1):
+    deck = SteeringDeck(host)
+    deck.addTest('Dark Noise Test v1.0 (KDH)',
+                 doms,
+                 executionTime=time,
+                 samples=(32, 0, 0, 0),
+                 atwd=atwdChip,
+                 fadc=0,
+                 trigMode=2,
+                 pulserMode=0,
+                 pulserFreq=10,
+                 filterWheel=6,
+		 site=site,
+                 hvsetting=1
+                 )
+    f = file("DarkNoise-ATWD%d.xml" % (atwdChip), "wt")
+    print >>f, deck
+    f.close()
+
+ if (site == "FATnomore"):
+   print "starting up DarkNoise Full Readout steering file creation..."
+   for atwdChip in (0, 1):
+     deck = SteeringDeck(host)
+     deck.addTest('Dark Noise Test Full Readout v1.0 (MK)',
+                                           doms,
+                                           executionTime=time,
+                                           samples=(128, 128, 128, 0),
+                                           atwd=atwdChip,
+                                           fadc=255,
+                                           trigMode=2,
+                                           pulserMode=0,
+                                           pulserFreq=10,
+                                           filterWheel=6,
+					   site=site,
+                                           hvsetting=1
+                                           )
+     f = file("DarkNoise-FullReadout-ATWD%d.xml" % (atwdChip), "wt")
+     print >>f, deck
+     f.close()
+   
+ print "starting up DarkNoise Multi-PE Full Readout steering file creation..."
+ for atwdChip in (0, 1):
+     deck = SteeringDeck(host)
+     deck.addTest('Dark Noise MultiPE Full Readout v1.0 (MK)',
+                                           doms,
+                                           executionTime=time,
+                                           samples=(128, 128, 128, 0),
+                                           atwd=atwdChip,
+                                           fadc=255,
+                                           trigMode=2,
+                                           pulserMode=0,
+                                           pulserFreq=10,
+                                           filterWheel=6,
+					   site=site,
+                                           spe=850,
+                                           hvsetting=1
+                                           )
+     f = file("DarkNoise-MultiPE-FullReadout-ATWD%d.xml" % (atwdChip), "wt")
+     print >>f, deck
+     f.close()
+
+ if (site == "SPS"):
+   print "starting up DarkNoise Multi-PE 5E6 Gain Full Readout steering file creation..."
+   for atwdChip in (0, 1):
+     deck = SteeringDeck(host)
+     deck.addTest('Dark Noise MultiPE 5E6Gain Full Readout v1.0 (MK)',
+                                           doms,
+                                           executionTime=200,
+                                           samples=(128, 128, 128, 0),
+                                           atwd=atwdChip,
+                                           fadc=255,
+                                           trigMode=2,
+                                           pulserMode=0,
+                                           pulserFreq=10,
+                                           filterWheel=6,
+					   site=site,
+                                           spe=800,
+					   hvsetting=2,
+                                           )
+     f = file("DarkNoise-MultiPE-5E6Gain-FullReadout-ATWD%d.xml" % (atwdChip), "wt")
+     print >>f, deck
+     f.close()
+   
+ if (site == "FATspecial"):
+   print "starting up DarkNoise Multi-PE 980 Disc 5E7 Gain Full Readout steering file creation..."
+#   for atwdChip in (0, 1):
+   atwdChip = 0
+   deck = SteeringDeck(host)
+   deck.addTest('Dark Noise MultiPE 980 Disc 5E7Gain Full Readout v1.0 (MK)',
+                                           doms,
+                                           executionTime=200,
+                                           samples=(128, 128, 128, 0),
+                                           atwd=atwdChip,
+                                           fadc=255,
+                                           trigMode=2,
+                                           pulserMode=0,
+                                           pulserFreq=10,
+                                           filterWheel=6,
+					   site=site,
+                                           spe=980,
+					   hvsetting=0,
+                                           )
+   f = file("DarkNoise-980Disc-5E7Gain-FullReadout-ATWD%d.xml" % (atwdChip), "wt")
+   print >>f, deck
+   f.close()
+   
+ if (site == "FATspecial"):
+   print "starting up DarkNoise 100 Volt PMT Full Readout steering file creation..."
+#   for atwdChip in (0, 1):
+   atwdChip = 0
+   deck = SteeringDeck(host)
+   deck.addTest('Dark Noise 100 Volt PMT Full Readout v1.0 (MK)',
+                                           doms,
+                                           executionTime=200,
+                                           samples=(128, 128, 128, 0),
+                                           atwd=atwdChip,
+                                           fadc=255,
+                                           trigMode=2,
+                                           pulserMode=0,
+                                           pulserFreq=10,
+                                           filterWheel=6,
+					   site=site,
+                                           spe=575,
+					   commonHV=100,
+                                           )
+   f = file("DarkNoise-100VoltPMT-FullReadout-ATWD%d.xml" % (atwdChip), "wt")
+   print >>f, deck
+   f.close()
+   
+ if (site == "FATspecial"):
+   print "starting up DarkNoise 20Hz run 1023 disc, PMT voltage 0.7 of way from 5E5 to 5E6 Full Readout steering file creation..."
+#   for atwdChip in (0, 1):
+   atwdChip = 0
+   deck = SteeringDeck(host)
+   deck.addTest('Dark Noise 20 Hz run 1023 disc, PMT voltage 0.7 of way from 5E5 to 5E6 Full Readout v1.0 (MK)',
+                                           doms,
+                                           executionTime=200,
+                                           samples=(128, 128, 128, 0),
+                                           atwd=atwdChip,
+                                           fadc=255,
+                                           trigMode=2,
+                                           pulserMode=0,
+                                           pulserFreq=10,
+                                           filterWheel=6,
+					   site=site,
+                                           spe=1023,
+					   hvsetting=10,
+                                           )
+   f = file("DarkNoise-1023disc-PMT-voltage-under-2E6-FullReadout-ATWD%d.xml" % (atwdChip), "wt")
+   print >>f, deck
+   f.close()
+   
+
+                         
+ print "starting up LocalCoincidence..."
+ for atwdChip in (0, 1):
+    deck = SteeringDeck(host)
+    deck.addTest('Local Coincidence v2.0 (MK)',
+                 doms,
+                 executionTime=3*time,
+                 samples=(128, 32, 32, 0),
+                 atwd=atwdChip,
+                 fadc=56,
+                 trigMode=2,
+		 localCoinc=800,
+		 site=site,
+                 )
+    f = file("LC-ATWD%d.xml" % (atwdChip), "wt")
+    print >>f, deck
+    f.close()
+
+ print "starting up MultiPE LocalCoincidence..."
+ for atwdChip in (0, 1):
+    deck = SteeringDeck(host)
+    deck.addTest('Local Coincidence v2.0 (MK)',
+                 doms,
+                 executionTime=3*time,
+                 samples=(128, 32, 32, 0),
+                 atwd=atwdChip,
+                 fadc=56,
+                 trigMode=2,
+		 localCoinc=800,
+		 site=site,
+	 	 spe=850,
+                 )
+    f = file("LC-MultiPE-ATWD%d.xml" % (atwdChip), "wt")
+    print >>f, deck
+    f.close()
+
+
+#label .FlasherStuff
+else:
+ print "starting up Flasherboard steering file creation..."
+
+
+#for domid in doms.items():
+#for domname in ('Chinook','Hurricane','Typhoon'):
+# domnumber = 00
+ FBbrightness = 127;
+ FBwidth = 20;
+ for FBmask in (0xFFF, ):
+          FBrate=610
+          atwdChip = 0
+          deck = SteeringDeck(host)
+          deck.addTest('Flasherboard v1.0 (MK)',
+                 doms,
+                 executionTime=time,
+                 samples=(32, 0, 0, 0),
+                 atwd=atwdChip,
+                 fadc=0,
+                 trigMode=2,
+		 localCoinc=800,
+                 domname=domname,
+                 FBbrightness=FBbrightness,
+                 FBwidth=FBwidth,
+                 FBmask=FBmask,
+                 FBrate=FBrate,
+		 site=site,
+		 )
+          f = file("Flasherboard-LC-%s-Bright%3.3d-Width%3.3d-Mask%3.3X-Rate%4.4d-ATWD%d.xml" % ( 
+            domname, FBbrightness, FBwidth, FBmask, FBrate, atwdChip), "wt")
+          print >>f, deck
+          f.close()
+

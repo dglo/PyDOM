@@ -1,0 +1,15 @@
+cd $HOME/monitoring
+
+ 
+# 565 = 0.25 PE
+# 575 = 0.3  PE
+# 663 = 1    PE
+# 794 = 2    PE
+# 922 = 3    PE
+ 
+
+nohup deadtime-scan 565
+nohup deadtime-scan 663
+nohup deadtime-scan 794
+nohup special-multimon-wrapper-new-one-hour
+nohup multimon-wrapper

@@ -1,0 +1,89 @@
+#!/bin/sh
+
+echo 
+echo starting multimon.py at `date`
+echo 
+
+
+cd $HOME/monitoring
+
+year=$(date +%Y)
+month=$(date +%m)
+day=$(date +%d)
+mkdir $year
+cd $year
+mkdir $month
+cd $month
+mkdir $day
+cd $day
+
+# 565 = 0.25 PE
+# 663 = 1    PE
+# 794 = 2    PE
+# 922 = 3    PE
+
+
+database="fat-dbs"
+computers="fathub1 fathub2"
+
+
+multimon.new.py -H ${database} -l 300 -d  0 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers}
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d00c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d  1 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d01c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d  2 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d02c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d  3 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d03c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d  4 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d04c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d  5 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d05c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d  6 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d06c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d  7 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d07c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d  8 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d08c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d  9 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d09c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d 10 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d10c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+
+multimon.new.py -H ${database} -l 300 -d 11 -c $1 -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers} 
+mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.d11c$1
+mkdir $HOME/monitoring/$year/$month/$day
+cd $HOME/monitoring/$year/$month/$day
+

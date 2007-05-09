@@ -1,0 +1,51 @@
+#!/bin/bash
+source setclasspath /mnt/data/testdaq/work
+
+echo "it is best to move the files in /mnt/data/testdaq/domcal out of this directory first "
+
+echo date is `date`
+
+
+cd /mnt/data/testdaq/domcal
+
+year=$(date +%Y)
+month=$(date +%m)
+day=$(date +%d)
+hour=$(date +%H)
+minute=$(date +%M)
+
+#rm latest-domcal-*
+ 
+#mkdir $year-$month-$day-$hour-$minute
+#ln -s $year-$month-$day-$hour-$minute latest-domcal-$year-$month-$day-$hour-$minute
+
+#cd $year-$month-$day-$hour-$minute
+ 
+
+
+echo "running calibrate dom calibrate hv on ports 5000 to 5063 on fathub1 "
+nohup java icecube.daq.domcal.DOMCal fathub1 5000 64 /mnt/data/testdaq/domcal/ calibrate dom calibrate hv &
+
+
+echo "running only calibrate dom on ports 5000 to 5063 on fathub2"
+nohup java icecube.daq.domcal.DOMCal fathub2 5000 64 /mnt/data/testdaq/domcal/ calibrate dom calibrate hv &
+
+
+#echo "running calibrate dom calibrate hv on ports 5000 to 5063 on fathub1 "
+#nohup java icecube.daq.domcal.DOMCal fathub1 5000 64 /mnt/data/testdaq/domcal/$year-$month-$day-$hour-$minute/ calibrate dom calibrate hv &
+
+
+#echo "running only calibrate dom on ports 5000 to 5063 on fathub2"
+#nohup java icecube.daq.domcal.DOMCal fathub2 5000 64 /mnt/data/testdaq/domcal/$year-$month-$day-$hour-$minute/ calibrate dom calibrate hv &
+
+# nohup java icecube.daq.domcal.DOMCal fathub1 5010 4 /mnt/data/testdaq/domcal/$year-$month-$day-$hour-$minute/ calibrate dom calibrate hv &
+#echo "running calibrate dom calibrate hv on the other 64 doms on fathub5 "
+#nohup java icecube.daq.domcal.DOMCal fathub5 5000 64 /mnt/data/testdaq/domcal/$year-$month-$day-$hour-$minute/ calibrate dom calibrate hv &
+
+
+
+
+echo " after domcal is finished you still need to run java icecube.daq.domcal.HV2DB /mnt/data/testdaq/domcal program to get the new voltages into the database"
+
+
+

@@ -1,0 +1,6 @@
+README.txt
+setup.py
+recursive-include examples *
+recursive-include icecube *
+recursive-include scripts *
+

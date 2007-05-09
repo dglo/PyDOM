@@ -1,0 +1,33 @@
+#!/bin/sh
+
+echo 
+echo starting multimon.py at `date`
+echo 
+
+database="fat-dbs"
+computers="fathub1 fathub2"
+
+
+
+cd $HOME/monitoring
+
+year=$(date +%Y)
+month=$(date +%m)
+day=$(date +%d)
+
+mkdir $year
+cd $year
+mkdir $month
+cd $month
+mkdir $day
+cd $day
+
+nohup multimon.py -H ${database} -S normalFAT -o $HOME/monitoring/$year/$month/$day ${computers}
+
+#mv $HOME/monitoring/$year/$month/$day $HOME/monitoring/$year/$month/$day.newmultimon
+
+#mkdir $HOME/monitoring/$year/$month/$day
+#cd $HOME/monitoring/$year/$month/$day
+
+
+#nohup multimon.py -H fat-dbs -S DESY -o $HOME/monitoring/$year/$month/$day fathub2 &
