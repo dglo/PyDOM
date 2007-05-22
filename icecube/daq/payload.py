@@ -1,6 +1,7 @@
 
 from struct import unpack
 from hits import domhit
+from slchit import DeltaCompressedHit as DCH
 from monitoring import MonitorRecordFactory
 
 def indent(string, n):
@@ -45,9 +46,13 @@ class EventPayload(Payload):
         hits = list()
         for rd in self.readout_data:
             for d in rd.data:
-                mbid = '%12.12x' % d.mbid
-                h = domhit(mbid, d.data)
-                h.utclk = d.utime
+                if isinstance(d, EngHitDataPayload):
+                    mbid = '%12.12x' % d.mbid
+                    h = domhit(mbid, d.data)
+                    h.utclk = d.utime
+                elif isinstance(d, DeltaCompressedHitPayload):
+                    mbid = '%12.12x' % d.mbid
+                    h = DCH(d.data, mbid, d.utime)
                 hits.append(h)
         return hits
         
@@ -77,6 +82,9 @@ class HitDataPayload(Payload):
         return "[HitDataPayload]: source ID=%d mbid=%12.12x utime=%d" % \
             (self.srcid, self.mbid, self.utime)
     
+class DeltaCompressedHitPayload(Payload):
+    pass
+
 class EngHitDataPayload(Payload):
     pass
     
@@ -171,6 +179,14 @@ def decode_payload(f):
         payload.srcid           = hdr[4]
         payload.interval        = (hdr[5], hdr[6])
         payload.data            = decode_composite(f)
+    elif type == 18:
+        payload = DeltaCompressedHitPayload(length, type, utime)
+        buf = f.read(length-16)
+        mbid, bochk, vers, pwd = unpack('>qhhh', buf[12:26])
+        payload.mbid = mbid
+        payload.vers = vers
+        payload.pwd  = pwd
+        payload.data = buf[26:]
     else:
         payload = Payload(length, type, utime)
         payload.data = f.read(length - 16)
