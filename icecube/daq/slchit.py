@@ -8,13 +8,17 @@ class SLCHit:
     hits all of which share the common header.
     """
     
-    def __init__(self, buf, mbid=None, utc=None):
+    def __init__(self, buf, mbid=None, utc=None, little_endian=False):
         self.buf  = buf[8:]
         self.mbid = mbid
         self.utc  = utc
-        self.domclk = unpack('<q', buf[0:8])
-        self.words  = unpack('<2i', self.buf[0:8])
-        
+        if little_endian:
+            self.domclk = unpack('<q', buf[0:8])
+            self.words  = unpack('<2i', self.buf[0:8])
+        else:
+            self.domclk = unpack('>q', buf[0:8])
+            self.words  = unpack('>2i', self.buf[0:8])
+            
     def __getattr__(self, name):
         if name == 'trigger':
             return (self.words[0] & 0x7ffe0000) >> 18
@@ -74,24 +78,26 @@ class delta_codec:
         for i in range(length):
             while True:
                 w = self.get_bits()
+                # print "%d: Got %d" % (i, w)
                 if w != (1 << (self.bpw -1)): break
                 self.shift_up()
             if abs(w) < self.bth: self.shift_down()
             last += w
+            # print "out", last
             out.append(last)
         return out
         
     def get_bits(self):
         while self.valid_bits < self.bpw:
             next_byte, = unpack('B', self.tape.read(1))
+            # print "Read", next_byte
             self.register |= (next_byte << self.valid_bits)
             self.valid_bits += 8
+        # print "Bit register:", bitstring(self.register, self.valid_bits)
         val = self.register & ((1 << self.bpw) - 1)
         if val > (1 << (self.bpw - 1)): val -= (1 << self.bpw)
-        for i in range(self.bpw):
-            self.register >>= 1
-            self.valid_bits -= 1
-            self.register &= ((1 << self.valid_bits) - 1)
+        self.register >>= self.bpw
+        self.valid_bits -= self.bpw
         return val
         
     def shift_up(self):
@@ -109,6 +115,7 @@ class delta_codec:
             self.bth = 32
         else:
             raise ValueError
+        # print "Shifted up to", self.bpw, self.bth
         
     def shift_down(self):
         if self.bpw == 2:
@@ -125,3 +132,11 @@ class delta_codec:
             self.bth = 4
         else:
             raise ValueError
+        # print "Shifted down to", self.bpw, self.bth
+        
+def bitstring(ival, nbits):
+    s = ""
+    for i in range(nbits):
+        s += str(ival & 1)
+        ival >>= 1
+    return s
