@@ -17,9 +17,12 @@ import re
 class Nicknames:
     def __init__(self, filename):
         pattern = re.compile( \
-            '([0-9a-f]{12})\s+([ATU][XP][0-9][HPY][0-9]' \
+            '([0-9a-f]{12})\s+([ATUX][EP][0-9][HPY][0-9]' \
             + '{4})\s+(\w+)\s+([0-9]{2}\-[0-9]{2}).*' \
             )
+        self.mpat = re.compile('[0-9a-f]{12}')
+        self.dpat = re.compile('[ATUX][EP][0-9][HPY][0-9]{4}')
+        self.lpat = re.compile('[0-9]{2}\-[0-9]{2}')
         f = file(filename)
         self.by_mbid  = dict()
         self.by_domid = dict()
@@ -41,13 +44,13 @@ class Nicknames:
         
     def lookup(self, key):
         """
-        Do a smart lookup of a DOM
+        Do a smart lookup of a DOM.  It knows what you are asking.
         """
-        if len(key) == 12:
+        if self.mpat.match(key):
             return self.domdb[self.by_mbid[key]]
-        elif len(key) == 8:
+        elif self.dpat.match(key):
             return self.domdb[self.by_domid[key]]
-        elif len(key) == 5:
+        elif self.lpat.match(key):
             return self.domdb[self.by_loc[key]]
         else:
             return self.domdb[self.by_name[key]]
