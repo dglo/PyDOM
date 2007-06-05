@@ -29,7 +29,7 @@ class Nicknames:
         while 1:
             s = f.readline()
             if len(s) == 0: break
-            m = pattern.matches(s)
+            m = pattern.match(s)
             if m is not None: self.domdb.append(m.groups())
         f.close()
         for index in range(len(self.domdb)):
@@ -37,7 +37,7 @@ class Nicknames:
             self.by_mbid[mbid] = index
             self.by_domid[domid] = index
             self.by_name[name] = index
-            self.by_loc[name] = index
+            self.by_loc[loc] = index
         
     def lookup(self, key):
         """
