@@ -1,34 +1,41 @@
+
 """
-Supernova entities.
+A module to handle IceCube supernova data
 """
 
-from struct import unpack
+from struct import unpack, pack
 
 class SNData:
     
-    def __init__(self, data):
+    def __init__(self, data, mbid, utc):
         """
         Create from payload
         """
-        pbyt, pfmt, self.utc, mbid, bytes, fmtid, t5, t4, t3, t2, t1, t0 = unpack(
-            '>iiqqhh6B', data[0:34])
+        bytes, fmtid, t5, t4, t3, t2, t1, t0 = unpack('>hh6B', data[0:10])
         self.mbid = '%12.12x' % mbid
-        self.scalers = unpack('%dB' % (bytes - 10), data[34:])
-        self.domclk  = ((((t5 << 8L | t4) << 8L | t3) << 8L | t2) << 8L | t1) << 8L | t0
+        self.utc  = utc
+        self.scalers = unpack('%dB' % (bytes - 10), data[10:])
+        self.domclk  = ((((t5 << 8L | t4) << 8L | t3) \
+            << 8L | t2) << 8L | t1) << 8L | t0
         self.utcend  = self.utc + len(self.scalers) * 16384000L
         
-def readsn(f):
-    d = dict()
-    while 1:
-        hdr = f.read(24)
-        if len(hdr) != 24: break
-        bytes, fmtid, utc, mbid = unpack('>iiqq', hdr)
-        buf = f.read(bytes-24)
-        mbid = "%12.12x" % mbid
-        if mbid not in d: d[mbid] = list()
-        d[mbid].append(SNData(hdr+buf))
-    return d
-    
+class SNPayloadReader:
+    def __init__(self, f):
+        self.f = f
+        
+    def __iter__(self):
+        return self
+        
+    def next(self):
+        while 1:
+            hdr = self.f.read(16)
+            if len(hdr) == 0: raise StopIteration
+            bytes, fmtid, utc = unpack('>iiq', hdr)
+            buf = self.f.read(bytes - 16)
+            if fmtid == 16:
+                mbid, = unpack('>q', buf[0:8])
+                return SNData(buf[8:], mbid, utc)
+                
 def procsn(f, holdoff=10000):
     
     mtim = dict()
@@ -99,3 +106,108 @@ def gaps(snvec):
         if (y.domclk - x.domclk) >> 16 != len(x.scalers): g.append(i-1)
     return g
    
+class S2Codec:
+    """
+    A simple encoder/decoder which translates SN vectors into
+    a bit-packed representation of symbols where
+    0        : 0
+    10       : 1
+    110      : 2
+    1110     : 3
+    11110100 : 4
+    11110101 : 5
+    &c.
+    11110000 : STOP
+    11110001 - 11110011 : UNDEF
+    """
+    def encode(self, scalers):
+        """
+        Transform scalers into packed bits.
+        """
+        self.bitvector = ""
+        self.register = 0
+        self.bpos = 0
+        for s in scalers:
+            if s == 0:
+                self.__push(0)
+            elif s == 1:
+                self.__push(1)
+                self.__push(0)
+            elif s == 2:
+                self.__push(1)
+                self.__push(1)
+                self.__push(0)
+            elif s == 3:
+                self.__pushn(14)
+            elif s < 16:
+                self.__pushn(15)
+                self.__pushn(s)
+            else:
+                raise ValueError, s
+                
+        # Push the STOP
+        self.__pushn(15)
+        self.__pushn(0)
+        
+        # Flush out anything remaining in the register
+        if self.bpos > 0:
+            self.bitvector += pack('B', self.register)
+            self.bpos = 0
+        
+    def decode(self):
+        scalers = [ ]
+        state = 0
+        self.bpos = 8
+        while 1:
+            b = self.__pop()
+            if state < 4:
+                if b == 0:
+                    scalers.append(state)
+                    state = 0
+                else:
+                    state += 1
+            else:
+                n = self.__popn()
+                # Check STOP signal
+                if n == 0: return scalers
+                scalers.append(n)
+                state = 0
+                
+    def __push(self, bit):
+        """
+        Internal method to append bit to bitvector.
+        """
+        if bit: self.register |= (1 << self.bpos)
+        self.bpos += 1
+        if self.bpos == 8:
+            self.bitvector += pack('B', self.register)
+            self.bpos = 0
+            self.register = 0
+            
+    def __pop(self):
+        if self.bpos == 8:
+            self.register = unpack('B', self.bitvector[0])[0]
+            self.bitvector = self.bitvector[1:]
+            self.bpos = 0
+        bit = self.register & 1
+        self.register >>= 1
+        self.bpos += 1
+        return bit
+        
+    def __pushn(self, nybble):
+        self.register |= (nybble << self.bpos)
+        self.bpos += 4
+        if self.bpos > 7:
+            self.bitvector += pack('B', self.register & 0xff)
+            self.register >>= 8
+            self.bpos -= 8
+        
+    def __popn(self):
+        if self.bpos > 4:
+            self.register |= (unpack('B', self.bitvector[0])[0] << (8-self.bpos))
+            self.bpos -= 8
+        nybble = self.register & 0x0f
+        self.register >>= 4
+        self.bpos += 4
+        return nybble
+        
