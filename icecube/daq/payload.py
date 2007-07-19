@@ -29,7 +29,7 @@ class EventPayload(Payload):
         self.readout_data = []
         
     def __str__(self):
-        txt = "[EventPayload]: Event #=%d-%d ival=(%d, %d)\n" % ((self.run_number, self.uid) + self.interval)
+        txt = "[EventPayload]: Event #=%d-%d-%d ival=(%d, %d)\n" % ((self.run_number, self.subrun_number, self.uid) + self.interval)
         txt += indent(str(self.trigger_request),4)
         return txt
         
@@ -112,7 +112,7 @@ def decode_payload(f):
         payload.mbid, = unpack('>q', f.read(8))
         payload.rec   = MonitorRecordFactory(f.read(length-24), 
             '%12.12x' % payload.mbid, payload.utime)
-    elif type == 13:
+    elif type == 13 or type == 19:
         payload = EventPayload(length, type, utime)
         # 38 bytes of 'header' information
         buf = f.read(38)
@@ -122,8 +122,14 @@ def decode_payload(f):
         payload.srcid           = hdr[2]
         payload.interval        = (hdr[3], hdr[4])
         payload.event_type      = hdr[5]
-        payload.event_cfg_id    = hdr[6]
-        payload.run_number      = hdr[7]
+        if type === 13:
+            payload.event_cfg_id    = hdr[6]
+            payload.run_number      = hdr[7]
+            payload.subrun_number   = 0
+        else:
+            payload.event_cfg_id    = 0
+            payload.run_number      = hdr[6]
+            payload.subrun_number   = hdr[7]
         composites              = decode_composite(f)
         payload.trigger_request = None
         payload.readout_data    = []
