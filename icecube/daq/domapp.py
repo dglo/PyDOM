@@ -206,7 +206,7 @@ class DOMApp:
 
     def startFlasherRun(self, bright, width, delay, mask, rate):
         self.sendMsg(EXPERIMENT_CONTROL, EXPCONTROL_BEGIN_FB_RUN,
-            data=pack(">HHhHH", bright, width, delay, mask, rate)
+            data=pack(">HHhHH", bright, width, delay, mask, rate))
             
     def endRun(self):
         self.sendMsg(EXPERIMENT_CONTROL, EXPCONTROL_END_RUN)
