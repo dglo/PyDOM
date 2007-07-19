@@ -122,7 +122,7 @@ def decode_payload(f):
         payload.srcid           = hdr[2]
         payload.interval        = (hdr[3], hdr[4])
         payload.event_type      = hdr[5]
-        if type === 13:
+        if type == 13:
             payload.event_cfg_id    = hdr[6]
             payload.run_number      = hdr[7]
             payload.subrun_number   = 0
