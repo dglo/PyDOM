@@ -220,3 +220,12 @@ def tohitstack(events):
                 h.utclk = d.utime
                 hits[mbid].append(h)
     return hits
+    
+def read_payloads(stream):
+    
+    pst = [ ]
+    while 1:
+        p = decode_payload(stream)
+        if p is None: return pst
+        pst.append(p)
+        
