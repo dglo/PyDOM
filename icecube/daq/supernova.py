@@ -210,4 +210,41 @@ class S2Codec:
         self.register >>= 4
         self.bpos += 4
         return nybble
+
+class ScalerComposition:
+    """
+    The ScalerComposition class allows one to 'merge' arrays of
+    unsynchronized scalers to produce a global scaler.  The scalers
+    are generic - they have a start time, an exposure time, and the
+    number of counts in that exposure time.  The class logic automatically
+    rebins the scalers to share the counts in 1 or more bins of the
+    global scaler.  It also tracks how many subelements went into a
+    bin of the global array.
+    """
+    def __init__(self, start_time, bin_width):
+        self.w = bin_width
+        self.st = start_time
+        self.ar = [ 0 ] * 1000
+        self.ct = [ 0 ] * 1000
         
+    def merge(self, t, dt, counts):
+        ix = int((t - self.st) / self.w)
+        iy = int((t + dt - self.st) / self.w)
+        if len(self.ar) < iy + 1:
+            dx = 2*(iy + 1 - len(self.ar))
+            self.ar += [ 0 ] * dx
+            self.ct += [ 0 ] * dx
+        for i in range(ix, iy + 1):
+            tt0 = max(t, self.st + i * self.w)
+            tt1 = min(t + dt, self.st + (i+1) * self.w)
+            frac = (tt1 - tt0) / dt
+            self.ar[i] += frac * counts
+            self.ct[i] += frac
+            
+    def globalArray(self):
+        """
+        Access the global scaler array.  Returns an array 
+            [ ( s0, c0 ), ( s1, c1 ), ... ]
+        of rebinned counts and the occupancy of the bins.
+        """
+        return zip(self.ar, self.ct)
