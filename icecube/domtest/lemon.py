@@ -1,5 +1,4 @@
-
-from numarray import *
+from math import sqrt
 
 def linearregression(x, y):
     xm = sum(x)/len(x)

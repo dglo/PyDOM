@@ -1,3 +1,7 @@
+"""
+Module for compressed hit formats
+"""
+
 from struct import unpack
 from cStringIO import StringIO
 
@@ -6,6 +10,18 @@ class SLCHit:
     The SLCHit class handles Soft Local Coincidence
     hits - that is, it is the base class for compressed
     hits all of which share the common header.
+    
+    All compressed hits have the following attributes
+        - slc.trigger : returns the trigger bits
+        - slc.lc : returns the LC bits
+        - slc.fadc_avail
+        - slc.atwd_avail
+        - slc.atwd_channels
+        - slc.atwd_chip
+        - slc.hit_size
+        - slc.chargestamp: returns a tuple of (peak-pos, fadc[peak-1],
+            fadc[peak], fadc[peak+1])
+        
     """
     
     def __init__(self, buf, mbid=None, utc=None, little_endian=False):
