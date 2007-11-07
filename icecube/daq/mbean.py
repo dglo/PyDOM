@@ -67,10 +67,15 @@ class BeanParser:
             if m is None: raise BeanParserException, self.s
             attrName = m.group(1)
             valText  = m.group(2)
-            if v0.match(valText):
-                if len(valText) > 8:
-                    attrVal = long(valText)
-                else:
-                    attrVal = int(valText)
-                self.activeBean.__dict__[attrName] = attrVal
-                
+            if v0.match(valText): self.activeBean.__dict__[attrName] = long(valText)
+	    lm = vl.match(valText)
+	    if lm is not None:
+		vlist = [ ]
+		for x in lm.group(1).split(","):
+		    if v0.match(x): 
+			vlist.append(long(x))
+		    else:
+			vlist.append(x)
+	        self.activeBean.__dict__[attrName] = vlist
+
+		
