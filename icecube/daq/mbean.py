@@ -1,0 +1,76 @@
+"""
+Python module to parse DAQ MBean logfiles
+"""
+
+import re
+from datetime import datetime, timedelta
+
+class BeanParserException(Exception):
+    def __init__(self, txt):
+        self.txt = txt
+    def __str__(self):
+        return self.txt
+
+h1 = re.compile(
+    "(\w+): (\d+)-(\d+)-(\d+)" +
+    " (\d+):(\d+):(\d+)\.(\d+)")
+h2 = re.compile("\s+(\w+):\s*(.+)")
+# A simple scalar value
+v0 = re.compile("\d+")
+# An array value
+v1 = re.compile("\[\s*(.+)\s*\]")
+
+class BeanInfo:
+    def __init__(self, name, time):
+        self.name = name
+        self.time = time
+        
+class BeanParser:
+
+    
+    def __init__(self, f):
+        self.f = f
+        self.state = 0
+        self.beanList = [ ]
+        self.activeBean = None
+        
+    def parse(self):
+        while 1:
+            self.s = self.f.readline()
+            if len(self.s) == 0: return
+            self.lineCallback()
+            
+    def lineCallback(self):
+        if self.state == 0:
+            m = h1.match(self.s)
+            if m is None: raise BeanParserException, s
+            beanName = m.group(1)
+            year = int(m.group(2))
+            month = int(m.group(3))
+            day = int(m.group(4))
+            hour = int(m.group(5))
+            minute = int(m.group(6))
+            second = int(m.group(7))
+            micro = int(m.group(8))
+            beanTime = datetime(year, month, day, hour, minute, second, micro)
+            self.activeBean = BeanInfo(beanName, beanTime)
+            self.state = 1
+            
+        elif self.state == 1:
+            if self.s == '\n':
+                self.state = 0
+                if self.activeBean is not None:
+                    self.beanList.append(self.activeBean)
+                    self.activeBean = None
+                return
+            m = h2.match(self.s)
+            if m is None: raise BeanParserException, self.s
+            attrName = m.group(1)
+            valText  = m.group(2)
+            if v0.match(valText):
+                if len(valText) > 8:
+                    attrVal = long(valText)
+                else:
+                    attrVal = int(valText)
+                self.activeBean.__dict__[attrName] = attrVal
+                
