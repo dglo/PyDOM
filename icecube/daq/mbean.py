@@ -16,9 +16,10 @@ h1 = re.compile(
     " (\d+):(\d+):(\d+)\.(\d+)")
 h2 = re.compile("\s+(\w+):\s*(.+)")
 # A simple scalar value
-v0 = re.compile("\d+")
+v0 = re.compile("[0-9]+$")
 # An array value
 v1 = re.compile("\[\s*(.+)\s*\]")
+v2 = re.compile("\'(.+)\'")
 
 class BeanInfo:
     def __init__(self, name, time):
@@ -35,15 +36,14 @@ class BeanParser:
         self.activeBean = None
         
     def parse(self):
-        while 1:
-            self.s = self.f.readline()
-            if len(self.s) == 0: return
-            self.lineCallback()
+        for line in self.f:
+            self.s = line
+            if len(self.s) != 0: self.lineCallback()
             
     def lineCallback(self):
         if self.state == 0:
             m = h1.match(self.s)
-            if m is None: raise BeanParserException, s
+            if m is None: return
             beanName = m.group(1)
             year = int(m.group(2))
             month = int(m.group(3))
@@ -68,12 +68,14 @@ class BeanParser:
             attrName = m.group(1)
             valText  = m.group(2)
             if v0.match(valText): self.activeBean.__dict__[attrName] = long(valText)
-	    lm = vl.match(valText)
+	    lm = v1.match(valText)
 	    if lm is not None:
 		vlist = [ ]
-		for x in lm.group(1).split(","):
+		for x in lm.group(1).split(", "):
 		    if v0.match(x): 
 			vlist.append(long(x))
+                    elif v2.match(x):
+                        vlist.append(x[1:-1])
 		    else:
 			vlist.append(x)
 	        self.activeBean.__dict__[attrName] = vlist
