@@ -72,7 +72,9 @@ class ReadoutRequest:
     
 class ReadoutRequestElement:
     def __str__(self):
-        return "[ReadoutRequestElement]: source ID=%d mbid=%12.12x" % (self.srcid, self.mbid)
+        return "[ReadoutRequestElement]: source ID=%d type=%d ival=(%d, %d)" \
+            (self.srcid, self.readout_type, 
+            self.interval[0], self.interval[1])
     
 class ReadoutDataPayload(Payload):
     pass
