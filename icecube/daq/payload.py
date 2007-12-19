@@ -58,8 +58,8 @@ class EventPayload(Payload):
         
 class TriggerRequestPayload(Payload):
     def __str__(self):
-        txt = "[TriggerRequestPayload]: source ID=%d trigtype=%d\n" % \
-            (self.srcid, self.trigger_type)
+        txt = "[TriggerRequestPayload]: source=%s trigtype=%d\n" % \
+            (source_str(self.srcid), self.trigger_type)
         for ex in self.readout_request.elements:
             txt += indent(str(ex),4)
         for h in self.hits:
@@ -72,8 +72,8 @@ class ReadoutRequest:
     
 class ReadoutRequestElement:
     def __str__(self):
-        return "[ReadoutRequestElement]: source ID=%d type=%d ival=(%d, %d)" % \
-            (self.srcid, self.readout_type, 
+        return "[ReadoutRequestElement]: source=%s type=%d ival=(%d, %d)" % \
+            (source_str(self.srcid), self.readout_type, 
             self.interval[0], self.interval[1])
     
 class ReadoutDataPayload(Payload):
@@ -81,8 +81,8 @@ class ReadoutDataPayload(Payload):
     
 class HitDataPayload(Payload):
     def __str__(self):
-        return "[HitDataPayload]: source ID=%d mbid=%12.12x utime=%d" % \
-            (self.srcid, self.mbid, self.utime)
+        return "[HitDataPayload]: source=%s mbid=%12.12x utime=%d" % \
+            (source_str(self.srcid), self.mbid, self.utime)
     
 class DeltaCompressedHitPayload(Payload):
     pass
@@ -230,4 +230,43 @@ def read_payloads(stream):
         p = decode_payload(stream)
         if p is None: return pst
         pst.append(p)
-        
+
+_srcDict = { 'domHub' : 1000,
+             'stringProc' : 2000,
+             'iceTopDH' : 3000,
+             'inIceTrig' : 4000,
+             'iceTopTrig' : 5000,
+             'glblTrig' : 6000,
+             'evtBldr' : 7000,
+             'tcalBldr' : 8000,
+             'moniBldr' : 9000,
+             'amandaTrig' : 10000,
+             'snBldr' : 11000,
+             'stringHub' : 12000,
+             'simHub' : 13000
+}
+
+def source_str(srcid):
+    (srcname, srcbase) = (None, None)
+    
+    for name in _srcDict:
+        base = _srcDict[name]
+        if srcid >= base and srcid < (base + 1000):
+            srcname = name
+            srcbase = base
+            break
+
+    if srcname is None:
+        if srcid == -1:
+            # hack for wildcard trigger requests
+            srcname = 'any'
+            srcbase = 0
+            srcid = 0
+        else:
+            srcname = 'unknown'
+            srcbase = 0
+
+    num = srcid - srcbase
+    if num == 0:
+        return srcname
+    return srcname + '#' + str(num)
