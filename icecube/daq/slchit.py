@@ -29,10 +29,10 @@ class SLCHit:
         self.mbid = mbid
         self.utc  = utc
         if little_endian:
-            self.domclk = unpack('<q', buf[0:8])
+            self.domclk, = unpack('<q', buf[0:8])
             self.words  = unpack('<2i', self.buf[0:8])
         else:
-            self.domclk = unpack('>q', buf[0:8])
+            self.domclk, = unpack('>q', buf[0:8])
             self.words  = unpack('>2i', self.buf[0:8])
             
     def __getattr__(self, name):
@@ -65,8 +65,8 @@ class SLCHit:
             
 class DeltaCompressedHit(SLCHit):
     
-    def __init__(self, buf, mbid=None, utc=None):
-        SLCHit.__init__(self, buf, mbid, utc)
+    def __init__(self, buf, mbid=None, utc=None, little_endian=False):
+        SLCHit.__init__(self, buf, mbid, utc, little_endian)
         self.decoded = False
         self.fADC = [ ]
         self.atwd = [ [], [], [], [] ]
