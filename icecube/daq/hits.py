@@ -39,6 +39,7 @@ class domhit:
     def __init__(self, domid, buf=None):
         """Init the d/s - fill in fields /w/ blanks."""
         self.domid = domid
+        self.mbid  = domid
         self.atwd = [ None, None, None, None ]
         if buf is not None:
             self.decode(buf)
