@@ -16,12 +16,9 @@ import re
 
 class Nicknames:
     def __init__(self, filename):
-        pattern = re.compile( \
-            '([0-9a-f]{12})\s+([ATUX][EPBT][0-9][HNPY][0-9]{4})' \
-            + '\s+(\w+)\s+([0-9A-Z]{2}\-[0-9]{2}).*' \
-            )
+        pattern = re.compile('([0-9a-f]{12})\s+(\w{8})\s+(\w+)\s+([0-9A-Z]{2}\-[0-9]{2}).*')
         self.mpat = re.compile('[0-9a-f]{12}')
-        self.dpat = re.compile('[ATUX][EP][0-9][HPY][0-9]{4}')
+        self.dpat = re.compile('([ATUX][EP][0-9][HPY][0-9]{4})')
         self.lpat = re.compile('[0-9]{2}\-[0-9]{2}')
         f = file(filename)
         self.by_mbid  = dict()
