@@ -50,6 +50,7 @@ class EventPayload(Payload):
                     mbid = '%12.12x' % d.mbid
                     h = domhit(mbid, d.data)
                     h.utclk = d.utime
+                    h.utc   = d.utime
                 elif isinstance(d, DeltaCompressedHitPayload):
                     mbid = '%12.12x' % d.mbid
                     h = DCH(d.data, mbid, d.utime)
