@@ -38,7 +38,16 @@ class EventPayload(Payload):
         tr = self.trigger_request
         triggers += recurse_triggers(tr)
         return triggers
-        
+
+    def getTrigHits(tr):
+        hits = []
+        for hit in tr.hits:
+            if isinstance(hit, HitDataPayload):
+                hits.append(hit)
+            elif isinstance(hit, TriggerRequestPayload):
+                hits += getTrigHits(hit)
+        return hits
+
     def getHits(self):
         """
         Return the hits as a flattened list
@@ -115,7 +124,7 @@ def decode_payload(f):
         payload.mbid, = unpack('>q', f.read(8))
         payload.rec   = MonitorRecordFactory(f.read(length-24), 
             '%12.12x' % payload.mbid, payload.utime)
-    elif type == 13 or type == 19:
+    elif type in (13, 19, 20):
         payload = EventPayload(length, type, utime)
         # 38 bytes of 'header' information
         buf = f.read(38)
@@ -124,13 +133,18 @@ def decode_payload(f):
         payload.uid             = hdr[1]
         payload.srcid           = hdr[2]
         payload.interval        = (hdr[3], hdr[4])
-        payload.event_type      = hdr[5]
+        payload.event_type      = 0
+        payload.event_cfg_id    = 0
+        payload.year            = 0
+        payload.subrun_number   = 0
+        if type == 13 or type == 19:
+            payload.event_type      = hdr[5]
+        elif type == 20:
+            payload.year            = (hdr[5] >> 16) & 0xffff
         if type == 13:
             payload.event_cfg_id    = hdr[6]
             payload.run_number      = hdr[7]
-            payload.subrun_number   = 0
-        else:
-            payload.event_cfg_id    = 0
+        elif type == 19 or type == 20:
             payload.run_number      = hdr[6]
             payload.subrun_number   = hdr[7]
         composites              = decode_composite(f)
