@@ -11,7 +11,7 @@ def indent(string, n):
     return txt
     
 def recurse_triggers(tr):
-    trig = [ (tr.srcid, tr.trigger_type) ]
+    trig = [ (tr.srcid, tr.trigger_type, tr.trigger_cfg_id) ]
     for st in tr.hits:
         if isinstance(st, TriggerRequestPayload):
             trig += recurse_triggers(st)
@@ -29,7 +29,8 @@ class EventPayload(Payload):
         self.readout_data = []
         
     def __str__(self):
-        txt = "[EventPayload]: Event #=%d-%d-%d ival=(%d, %d)\n" % ((self.run_number, self.subrun_number, self.uid) + self.interval)
+        txt = "[EventPayload]: Event #=%d-%d-%d ival=(%d, %d)\n" % \
+			((self.run_number, self.subrun_number, self.uid) + self.interval)
         txt += indent(str(self.trigger_request),4)
         return txt
         
@@ -246,6 +247,40 @@ def read_payloads(stream):
         if p is None: return pst
         pst.append(p)
 
+def make21trig(t, t0, hits):
+	buf = ""
+	hbuf = ""
+	for x in t.hits:
+		if isinstance(x, TriggerRequestPayload): 
+			buf += make21trig(x, t0)
+		elif isinstance(x, HitDataPayload):
+			n += 1
+			idx = -1
+			for i in range(len(hits)):
+				hit = hits[i]
+				if ininstance(hit, SLCHit) and x.mbid == hit.mbid and x.utime == hit.utc:
+					idx = i
+					break
+			hbuf += pack(">i", idx)
+	buf += pack(">6i", t.trigger_type, t.trigger_cfg_id, t.srcid,
+				t.interval[0] - t0, t.interval[1] - t0, n) + hbuf
+	return buf
+
+def make21hits(hits, t0):
+	return ""
+
+def make21(evt):
+	trig_buf = ""
+	hits_buf = ""
+	ntrig = 0
+	t = evt.trigger_request
+	buf = pack(">iq2h6i", 21, evt.utime, 1, evt.year, evt.uid,
+			   evt.run_number, evt.subrun_number, 
+			   evt.interval[0] - evt.utime, evt.interval[1] - evt.utime, ntrig) + \
+			   make21trig(t, evt.utime, hits) + \
+			   make21hits(evt.utime, hits)
+	buf = pack(">i", len(buf) + 4) + buf
+	
 _srcDict = { 'domHub' : 1000,
              'stringProc' : 2000,
              'iceTopDH' : 3000,
