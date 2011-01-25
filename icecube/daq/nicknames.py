@@ -12,7 +12,7 @@ You should define an environmental variable NICKNAMES which points
 to a file with MBID\s+DOMID\s+NICKNAME\s+LOCATION lines.
 """
 
-import re
+import os, re
 
 class Nicknames:
     def __init__(self, filename):
@@ -52,3 +52,14 @@ class Nicknames:
         else:
             return self.domdb[self.by_name[key]]
         
+
+if 'NICKNAMES' in os.environ: 
+	nickdef = Nicknames(os.environ['NICKNAMES'])
+else:
+	nickdef = None
+
+def lookup(key):
+	if nickdef is None: return
+	return nickdef.lookup(key)
+
+
