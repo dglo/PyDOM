@@ -13,7 +13,7 @@ from urllib import urlopen
 from xml.dom.minidom import parse
 from numpy import array, zeros, sum, concatenate
 from math import sqrt
-from numarray.fft import fft
+#from numarray.fft import fft
 
 revision = "$Rev$"
 debug_level = 1                 # 1: normal output level - warnings / errors
