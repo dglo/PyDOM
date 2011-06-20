@@ -8,7 +8,8 @@ import sys, os, time, math, struct
 from icecube.domtest.hits import domhit
 from ConfigParser import ConfigParser
 from PyBook import Histogram
-from numpy.numarray import array, arange, zeros, sum, matrixmultiply,sqrt
+from numpy import array, arange, zeros, sum, sqrt
+from numpy.numarray import matrixmultiply
 from numpy.numarray.linear_algebra import linear_least_squares, eigenvalues
 from cStringIO import StringIO
 
