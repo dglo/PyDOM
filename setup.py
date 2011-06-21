@@ -20,7 +20,7 @@ scfiles=[ 'scripts/HubDaemon.py',
           ]
 setup(
     name='PyDOM',
-    version='4.1.0',
+    version='4.2.0',
     description='Python classes to interact with IceCube DOMs',
     long_description="""
         IceCube Project Python interface to DOMs and DOMHubs.
