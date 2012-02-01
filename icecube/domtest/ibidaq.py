@@ -596,7 +596,7 @@ def unpack_odx_clock(zlist):
     return (long(clkh + clkl, 16), long(res1 + res0, 16))
     
 def forthHex(anum):
-    return '$' + hex(anum)[2:]
+    return '$%x' % anum
     
 def repTriggerMode(mode):
-    return hex(mode)[2:]
+    return '%x' % mode
