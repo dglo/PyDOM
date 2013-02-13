@@ -17,21 +17,41 @@ def recurse_triggers(tr):
             trig += recurse_triggers(st)
     return trig
 
+class PayloadException(Exception):
+    pass
+
 class Payload:
 
     def __init__(self, length, type, utime):
         self.length, self.type, self.utime = length, type, utime
 
+    def __str__(self):
+        return "Payload#%d[@%d, %d bytes]" % (self.type, self.utime, self.length)
+
 class EventPayload(Payload):
 
     def __init__(self, length, type, utime):
         Payload.__init__(self, length, type, utime)
+        self.run_number = 0
+        self.subrun_number = 0
+        self.uid = 0
+        self.interval = [0, 0]
+        self.trigger_request = None
         self.readout_data = []
+        self.trigger_records = None
 
     def __str__(self):
-        txt = "[EventPayload]: Event #=%d-%d-%d ival=(%d, %d)\n" % \
-			((self.run_number, self.subrun_number, self.uid) + self.interval)
-        txt += indent(str(self.trigger_request),4)
+        txt = "[EventPayload]: Event #"
+        if self.subrun_number == 0:
+            txt += "%d-%d" % (self.run_number, self.uid)
+        else:
+            txt += "%d/%d-%d" % (self.run_number, self.subrun_number, self.uid)
+        txt += " ival=(%d, %d)\n" % self.interval
+        if self.trigger_request is not None:
+            txt += indent(str(self.trigger_request),4)
+        if self.trigger_records is not None:
+            for tr in self.trigger_records:
+                txt += indent(str(tr),4)
         return txt
 
     def getTriggers(self):
@@ -104,6 +124,55 @@ class EngHitDataPayload(Payload):
 class MonitorRecordPayload(Payload):
     pass
 
+class DeltaSenderHit(object):
+    def __init__(self, mbid, utime, version, pedestal, domclk, word0, word2,
+                 data):
+        self.mbid = mbid
+        self.utime = utime
+        self.pedestal = pedestal
+        self.domclk = domclk
+        self.word0 = word0
+        self.word2 = word2
+        self.data = data
+
+    def __str__(self):
+        return "DeltaSenderHit@%d[dom %012x]" % (self.utime, self.mbid)
+
+class HitRecord(object):
+    def __init__(self, chanid, utime):
+        self.chanid = chanid
+        self.utime = utime
+
+class EngHitRecord(HitRecord):
+    def __init__(self, flags, chanid, utime, data):
+        super(EngHitRecord, self).__init__(chanid, utime)
+        self.flags = None
+        self.data = data
+
+class DeltaHitRecord(HitRecord):
+    def __init__(self, flags, chanid, utime, data):
+        super(DeltaHitRecord, self).__init__(chanid, utime)
+        self.flags = flags
+        self.data = data
+    def __str__(self):
+        return "DeltaHitRecord@%d[chanid %d]" % (self.utime, self.chanid)
+
+class TriggerRecord(object):
+    def __init__(self, ttype, cfgid, srcid, starttime, endtime, hits):
+        self.trigger_type = ttype
+        self.cfgid = cfgid
+        self.srcid = srcid
+        self.interval = (starttime, endtime)
+        self.hits = hits
+
+    def __str__(self):
+        txt = "[TriggerRecord]: source=%s trigtype=%d\n" % \
+            (source_str(self.srcid), self.trigger_type)
+        for h in self.hits:
+            txt += indent(str(h),4)
+        txt += '--'
+        return txt
+
 def decode_payload(f):
     """
     Read a payload from the stream f
@@ -120,6 +189,17 @@ def decode_payload(f):
         payload.srcid           = hdr[2]
         payload.mbid            = hdr[3]
         payload.trigger_mode    = hdr[4]
+    elif type == 3:
+        mbid = utime
+        hdr = unpack(">8xQHHHQII", f.read(38))
+
+        if hdr[1] != 1:
+            raise PayloadException(("Bad order-check %d for DeltaSenderHit" +
+                                    " (should be 1)") % hdr[1])
+
+        data = f.read(length - 54)
+        payload = DeltaSenderHit(utime, hdr[0], hdr[2], hdr[3], hdr[4], hdr[5],
+                                 hdr[6], data)
     elif type == 5:
         payload = MonitorRecordPayload(length, type, utime)
         payload.mbid, = unpack('>q', f.read(8))
@@ -154,6 +234,59 @@ def decode_payload(f):
         if len(composites) > 0:
             payload.trigger_request = composites.pop(0)
         payload.readout_data = composites
+    elif type == 21:
+        payload = EventPayload(length, type, utime)
+        # 38 bytes of 'header' information
+        hdr = unpack(">IHIIII", f.read(22))
+        payload.interval        = (utime, utime + hdr[0])
+        payload.year            = hdr[1]
+        payload.uid             = hdr[2]
+        #payload.srcid           = hdr[2]
+        payload.run_number      = hdr[3]
+        payload.event_cfg_id    = 0
+        payload.subrun_number   = hdr[4]
+
+        num_hitrecs             = hdr[5]
+
+        hits = []
+        for i in xrange(num_hitrecs):
+            hdr = unpack(">HBBHI", f.read(10))
+
+            rlen = hdr[0]
+            rtype = hdr[1]
+            flags = hdr[2]
+            chanID = hdr[3]
+            time = utime + hdr[4]
+
+            buf = f.read(rlen - 10)
+            if rtype == 0:
+                hits.append(EngHitRecord(flags, chanID, time, buf))
+            elif rtype == 1:
+                hits.append(DeltaHitRecord(flags, chanID, time, buf))
+
+        num_trigrecs = unpack(">I", f.read(4))[0]
+
+        trigrecs = []
+        for i in xrange(num_trigrecs):
+            hdr = unpack(">ii4I", f.read(24))
+
+            ttype = hdr[0]
+            cfgid = hdr[1]
+            srcid = hdr[2]
+            starttime = utime + hdr[3]
+            endtime = utime + hdr[4]
+            num_hits = hdr[5]
+
+            fmt = ">%dI" % num_hits
+
+            trighits = []
+            for i in unpack(fmt, f.read(num_hits * 4)):
+                trighits.append(hits[i])
+            trigrecs.append(TriggerRecord(ttype, cfgid, srcid, starttime,
+                                          endtime, trighits))
+
+        payload.trigger_records = trigrecs
+
     elif type == 9:
         payload = TriggerRequestPayload(length, type, utime)
         buf = f.read(34)
@@ -240,12 +373,11 @@ def tohitstack(events):
     return hits
 
 def read_payloads(stream):
-
-    pst = [ ]
     while 1:
         p = decode_payload(stream)
-        if p is None: return pst
-        pst.append(p)
+        if p is None:
+            return
+        yield p
 
 def make21trig(t, t0, hits):
 	buf = ""
