@@ -9,31 +9,31 @@ def indent(string, n):
     for line in string.split('\n'):
         txt += ' '*n + line + '\n'
     return txt
-    
+
 def recurse_triggers(tr):
     trig = [ (tr.srcid, tr.trigger_type, tr.trigger_cfg_id) ]
     for st in tr.hits:
         if isinstance(st, TriggerRequestPayload):
             trig += recurse_triggers(st)
     return trig
-    
+
 class Payload:
-    
+
     def __init__(self, length, type, utime):
         self.length, self.type, self.utime = length, type, utime
-        
+
 class EventPayload(Payload):
-    
+
     def __init__(self, length, type, utime):
         Payload.__init__(self, length, type, utime)
         self.readout_data = []
-        
+
     def __str__(self):
         txt = "[EventPayload]: Event #=%d-%d-%d ival=(%d, %d)\n" % \
 			((self.run_number, self.subrun_number, self.uid) + self.interval)
         txt += indent(str(self.trigger_request),4)
         return txt
-        
+
     def getTriggers(self):
         triggers = [ ]
         tr = self.trigger_request
@@ -66,7 +66,7 @@ class EventPayload(Payload):
                     h = DCH(d.data, mbid, d.utime)
                 hits.append(h)
         return hits
-        
+
 class TriggerRequestPayload(Payload):
     def __str__(self):
         txt = "[TriggerRequestPayload]: source=%s trigtype=%d\n" % \
@@ -77,33 +77,33 @@ class TriggerRequestPayload(Payload):
             txt += indent(str(h),4)
         txt += '--'
         return txt
-        
+
 class ReadoutRequest:
     pass
-    
+
 class ReadoutRequestElement:
     def __str__(self):
         return "[ReadoutRequestElement]: source=%s type=%d ival=(%d, %d)" % \
-            (source_str(self.srcid), self.readout_type, 
+            (source_str(self.srcid), self.readout_type,
             self.interval[0], self.interval[1])
-    
+
 class ReadoutDataPayload(Payload):
     pass
-    
+
 class HitDataPayload(Payload):
     def __str__(self):
         return "[HitDataPayload]: source=%s mbid=%12.12x utime=%d" % \
             (source_str(self.srcid), self.mbid, self.utime)
-    
+
 class DeltaCompressedHitPayload(Payload):
     pass
 
 class EngHitDataPayload(Payload):
     pass
-    
+
 class MonitorRecordPayload(Payload):
     pass
-    
+
 def decode_payload(f):
     """
     Read a payload from the stream f
@@ -123,7 +123,7 @@ def decode_payload(f):
     elif type == 5:
         payload = MonitorRecordPayload(length, type, utime)
         payload.mbid, = unpack('>q', f.read(8))
-        payload.rec   = MonitorRecordFactory(f.read(length-24), 
+        payload.rec   = MonitorRecordFactory(f.read(length-24),
             '%12.12x' % payload.mbid, payload.utime)
     elif type in (13, 19, 20):
         payload = EventPayload(length, type, utime)
@@ -151,7 +151,7 @@ def decode_payload(f):
         composites              = decode_composite(f)
         payload.trigger_request = None
         payload.readout_data    = []
-        if len(composites) > 0: 
+        if len(composites) > 0:
             payload.trigger_request = composites.pop(0)
         payload.readout_data = composites
     elif type == 9:
@@ -178,7 +178,7 @@ def decode_payload(f):
             hdr = unpack(">2i3q", buf)
             r2e.readout_type    = hdr[0]
             r2e.srcid           = hdr[1]
-            r2e.interval        = (hdr[2], hdr[3]) 
+            r2e.interval        = (hdr[2], hdr[3])
             r2e.mbid            = hdr[4]
             payload.readout_request.elements.append(r2e)
         payload.hits            = decode_composite(f)
@@ -215,7 +215,7 @@ def decode_payload(f):
         payload = Payload(length, type, utime)
         payload.data = f.read(length - 16)
     return payload
-    
+
 def decode_composite(f):
     envelope = f.read(8)
     length, type, n = unpack(">ihh", envelope)
@@ -238,9 +238,9 @@ def tohitstack(events):
                 h.utclk = d.utime
                 hits[mbid].append(h)
     return hits
-    
+
 def read_payloads(stream):
-    
+
     pst = [ ]
     while 1:
         p = decode_payload(stream)
@@ -251,7 +251,7 @@ def make21trig(t, t0, hits):
 	buf = ""
 	hbuf = ""
 	for x in t.hits:
-		if isinstance(x, TriggerRequestPayload): 
+		if isinstance(x, TriggerRequestPayload):
 			buf += make21trig(x, t0)
 		elif isinstance(x, HitDataPayload):
 			n += 1
@@ -275,12 +275,12 @@ def make21(evt):
 	ntrig = 0
 	t = evt.trigger_request
 	buf = pack(">iq2h6i", 21, evt.utime, 1, evt.year, evt.uid,
-			   evt.run_number, evt.subrun_number, 
+			   evt.run_number, evt.subrun_number,
 			   evt.interval[0] - evt.utime, evt.interval[1] - evt.utime, ntrig) + \
 			   make21trig(t, evt.utime, hits) + \
 			   make21hits(evt.utime, hits)
 	buf = pack(">i", len(buf) + 4) + buf
-	
+
 _srcDict = { 'domHub' : 1000,
              'stringProc' : 2000,
              'iceTopDH' : 3000,
@@ -298,7 +298,7 @@ _srcDict = { 'domHub' : 1000,
 
 def source_str(srcid):
     (srcname, srcbase) = (None, None)
-    
+
     for name in _srcDict:
         base = _srcDict[name]
         if srcid >= base and srcid < (base + 1000):
