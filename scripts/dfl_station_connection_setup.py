@@ -42,7 +42,7 @@ def usage():
                          inserted into the database
 
           Arguments:
-          
+
           DOMHUB.CARDWIREDOM is for example domhub1.11B the connection to DOM B on card 1, wire 1 on
           domhub1.
 
@@ -51,7 +51,7 @@ def usage():
           Example:
 
           Define the connection for station #6, which takes the A-DOM on card2 wire0, the card is located
-          in domhub3. The breakout box 2 and connector 4 is used. 
+          in domhub3. The breakout box 2 and connector 4 is used.
 
           dfl_station_connection_setup.py -H dbsever -u user -p passwd -s DESY --breakoutbox 4.2 domhub3.20A 6
 
@@ -64,7 +64,7 @@ def prompt(string, validItems=None):
 
     If validItems is empty any input is returned
     """
-               
+
     while True:
         input = str(raw_input(string))
         if validItems is None:
@@ -105,7 +105,7 @@ except GetoptError, e:
     print e
     usage()
     sys.exit(1)
-    
+
 # parse the options
 for option, value in options:
     if option == '-h':
@@ -159,7 +159,7 @@ if stationIdentifier is not None and domhub is not None:
             userInput = str()
             userInput = prompt("No station %s found in the database! Do you want to insert it [y|n]?" % stationIdentifier,
                        ('y','n'))
-            
+
         if userInput == 'y':
             try:
                 stationId = fatsetup.insertStation(db, labName, stationIdentifier)
@@ -172,7 +172,7 @@ if stationIdentifier is not None and domhub is not None:
 
     # get the connection id
     try:
-        
+
         connectionId = fatsetup.getConnectionId(db, labName, domhub, dorCard, wirePair,
                                                 wirePosition, breakoutbox, breakoutboxConnector)
     except Exception, e:
@@ -182,7 +182,7 @@ if stationIdentifier is not None and domhub is not None:
             userInput = str()
             userInput = prompt("No connection %s.%s%s%s found in the database! Do you want to insert it [y|n]?" % \
                                (domhub, dorCard, wirePair, wirePosition), ('y','n'))
-            
+
         if userInput == 'y':
             try:
                 connectionId = fatsetup.insertConnection(db, labName, domhub, dorCard, wirePair,
@@ -192,27 +192,18 @@ if stationIdentifier is not None and domhub is not None:
                 print e
                 print >>sys.stderr, "Could not insert the connection into the database!"
                 sys.exit(1)
-    
+
     try:
         fatsetup.mapStationToConnection(db, stationId, connectionId)
         print "Mapped station %s to connection %s.%s%s%s" % (stationIdentifier, domhub, dorCard, wirePair, wirePosition)
-        
+
     except Exception, e:
         print e
         print >>sys.stderr, "Could not map station %s to connection %s.%s%s%s" % \
               (stationIdentifier, domhub, dorCard, wirePair, wirePosition)
         sys.exit(1)
-    
+
 if printMapping:
     fatsetup.printStationToConnectionMapping(db, labName)
 
 sys.exit(0)
-
-    
-                    
-    
-
-
-          
-    
-    
