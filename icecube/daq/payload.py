@@ -373,7 +373,7 @@ def tohitstack(events):
     return hits
 
 def read_payloads(stream):
-    while 1:
+    while True:
         p = decode_payload(stream)
         if p is None:
             return

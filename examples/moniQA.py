@@ -19,7 +19,7 @@ for d in doms: db[d[0]] = d
 monitoring = dict()
 while len(args) > 0:
     f = file(args.pop(0), 'rb')
-    while 1:
+    while True:
         mp = decode_payload(f)
         if mp is None: break
         mbid = '%12.12x' % mp.mbid
@@ -30,7 +30,6 @@ while len(args) > 0:
                 
 # Summarize stats
 domids = monitoring.keys()
-domids.sort()
 
 for string in range(1, 81):
     onstr = [ int(domid[3:5]) for domid in domids if int(domid[0:2]) == string ]
@@ -43,7 +42,7 @@ for string in range(1, 81):
 #        print missii
 #        print missit
         
-for domid in domids:
+for domid in sorted(domids):
     mlist = monitoring[domid]
     t0 = mlist[0].timestamp * 1.0E-10
     t2 = mlist[-1].timestamp * 1.0E-10

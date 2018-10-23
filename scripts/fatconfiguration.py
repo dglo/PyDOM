@@ -194,7 +194,7 @@ def configurationDialog(doms, DIALOG_SELECT):
     totalNumberOfDOMs = len(doms)
     for dom in doms:
         currentDOM += 1
-        while 1:
+        while True:
             fields = {}
             # print the current configuration
             if dom.name is None:
@@ -360,7 +360,7 @@ def prompt(string, validItems=None):
     If validItems is empty any input is returned
     """
                
-    while 1:
+    while True:
         input = str(raw_input(string))
         if validItems is None:
             return input

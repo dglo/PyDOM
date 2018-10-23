@@ -26,7 +26,7 @@ class Nicknames:
         self.by_name  = dict()
         self.by_loc   = dict()
         self.domdb    = [ ]
-        while 1:
+        while True:
             s = f.readline()
             if len(s) == 0: break
             m = pattern.match(s)

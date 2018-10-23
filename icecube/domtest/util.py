@@ -44,7 +44,7 @@ def readDHHits(f):
     """
     
     d = dict()
-    while 1:
+    while True:
         hdr = f.read(16)
         if len(hdr) != 16: return d
         (length, type, mbid) = struct.unpack('>iiq', hdr)
@@ -461,9 +461,8 @@ class spefit:
         # Then apply various heuristic criteria
         # - first, ensure that the roots are within the
         # specified range of the fit
-        rz = filter(lambda u: u > x[x0] and u < x[x1], rz)
+        rz = sorted(filter(lambda u: u > x[x0] and u < x[x1], rz))
         
-        rz.sort()
         # Ask for concave up followed by concave down that is max
         dd = d[1:] * arange(1, len(d))
         self.xz = [ (z,polyval(self.b, z),polyval(dd, z) > 0) for z in rz ]

@@ -189,7 +189,7 @@ def readMoniStream(f):
     
     xroot = { }
     
-    while 1:
+    while True:
         hdr = f.read(32)
         if len(hdr) == 0: break
         (recl, recid, domid, timestamp) = unpack('>iiq8xq', hdr)
@@ -210,7 +210,7 @@ def readMoniStreamDH(f):
     
     xroot = { }
     
-    while 1:
+    while True:
         hdr = f.read(16)
         if len(hdr) != 16: break
         (recl, recid, domid) = unpack('>iiq', hdr)

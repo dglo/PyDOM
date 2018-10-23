@@ -87,7 +87,7 @@ class LUXFile:
         Load in the LUX lightsource data from a file stream.  
         """
         self.runs = list()
-        while 1:
+        while True:
             s = f.readline()
             if len(s) == 0: break
             if comment.match(s): continue

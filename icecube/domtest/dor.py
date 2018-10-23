@@ -100,7 +100,7 @@ class Driver:
             ci = CardInfo(int(cre.match(c).group(1)))
             self.cards.append(ci)
             f = file(os.path.join(self.path(ci.id), "fpga"))
-            while 1:
+            while True:
                 s = f.readline()
                 if s == "":
                     break

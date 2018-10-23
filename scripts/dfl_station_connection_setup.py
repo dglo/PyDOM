@@ -65,7 +65,7 @@ def prompt(string, validItems=None):
     If validItems is empty any input is returned
     """
                
-    while 1:
+    while True:
         input = str(raw_input(string))
         if validItems is None:
             return input
