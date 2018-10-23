@@ -67,13 +67,11 @@ for mbid, hlist in hits.items():
         brate = 1000.0 * len(beacons) / (t1-t0)
     rates[db[mbid][3]] = (len(hlist), len(beacons), t0, t1, hrate, brate)
 
-pos = rates.keys()
-pos.sort()
 print 'DOM hit summary information for all discovered DOMs follows'
 print 'Total # of hits:', nhits
 print '        # of  # of                            Hit     Beacon'
 print ' DOM    Hits Beacon     T0          T0        Rate     Rate'
 print '                                              [mHz]    [mHz]'
 print '-------------------------------------------------------------'
-for x in pos:
+for x in sorted(rates.keys()):
     print '%s %6d %6d %11.3f %11.3f %8.3f %8.3f ' % ((x,) + rates[x])

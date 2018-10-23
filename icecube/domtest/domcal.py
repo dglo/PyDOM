@@ -85,7 +85,7 @@ class Fit:
     Fit data class.
     """
     def __init__(self, swi, args=None):
-        if type(swi) is str:
+        if isinstance(swi, str):
             self.model = swi
             self.param = { "slope" : args[0], "intercept" : args[1] }
             self.r = args[2]

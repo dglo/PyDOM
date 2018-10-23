@@ -71,7 +71,7 @@ class dom_harness:
 
         # Clear out stale data
         # self.app.resetLookbackMemory()
-        while 1:
+        while True:
             w = self.app.getWaveformData()
             if len(w) == 0: break
             

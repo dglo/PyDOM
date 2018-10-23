@@ -27,7 +27,7 @@ class SNPayloadReader:
         return self
         
     def next(self):
-        while 1:
+        while True:
             hdr = self.f.read(16)
             if len(hdr) == 0: raise StopIteration
             bytes, fmtid, utc = unpack('>iiq', hdr)
@@ -46,7 +46,7 @@ def procsn(f, holdoff=10000):
     da = 5000000000L
     db = 16384000L
     
-    while 1:
+    while True:
         hdr = f.read(24)
         if len(hdr) != 24: break
         bytes, fmtid, utc, mbid = unpack('>iiqq', hdr)
@@ -158,7 +158,7 @@ class S2Codec:
         scalers = [ ]
         state = 0
         self.bpos = 8
-        while 1:
+        while True:
             b = self.__pop()
             if state < 4:
                 if b == 0:

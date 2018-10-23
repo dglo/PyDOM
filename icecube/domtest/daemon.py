@@ -84,7 +84,7 @@ def handle_action(action, inFile='/dev/null', outFile='/dev/null',
         if not pid:
             return 'Could not stop, pid file "%s" missing.' % pidFile
         try:
-            while 1:
+            while True:
                 os.kill(pid, signal.SIGTERM)
                 time.sleep(1)
         except OSError, err:

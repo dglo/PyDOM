@@ -47,9 +47,7 @@ class UptimeStats:
         self.stat[date] += dt
         
     def printStats(self):
-        epochs = self.stat.keys()
-        epochs.sort()
-        for x in epochs:
+        for x in sorted(self.stat.keys()):
             print "%4.4d-%2.2d-%2.2d %4.2f" % (jdtog(x+2400001) + (self.stat[x],))
 
 if __name__ == "__main__":

@@ -246,7 +246,7 @@ class ibx:
         if prompt.find('#') >= 0:
             # send 'r' to get out of configboot, if you are there
             self.s.send('r\r\n')
-            while 1:
+            while True:
                 si, so, sx = select([ self.s ], [], [], 5.0)
                 if len(si) > 0:
                     try:
@@ -261,7 +261,7 @@ class ibx:
                     break
 
         # More junk flushing
-        while 1:
+        while True:
             si, so, sx = select([ self.s ], [], [], 0.1)
             if len(si) == 0: break
             self.recv(timeout=0.1)
@@ -276,7 +276,7 @@ class ibx:
     def recv(self, timeout=1.0):
         """Read bytes until iceboot starts blocking."""
         msg = ''
-        while 1:
+        while True:
             si, so, sx = select([ self.s ], [], [], 0.1)
             if len(si) > 0:
                 try:

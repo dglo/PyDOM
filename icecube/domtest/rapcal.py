@@ -146,7 +146,7 @@ class TimeCalibrator:
         """
         self.rcd = dict()
         if fmtver == 2:
-            while 1:
+            while True:
                 hdr = f.read(16)
                 if len(hdr) != 16: return
                 recl, fmtid, mbid = unpack('>iiq', hdr)
@@ -163,7 +163,7 @@ class TimeCalibrator:
             recl = 334
         else:
             raise ValueError, "Unknown TCAL format version %d" % fmtver
-        while 1:
+        while True:
             buf = f.read(recl)
             if len(buf) != recl: break
             mbid = "%12.12x" % unpack("q", buf[0:8])

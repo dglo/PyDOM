@@ -4,7 +4,7 @@ import struct
 
 f = file('../../data/rapcal.dat', 'rb')
 cals = [ ]
-while 1:
+while True:
     buf = f.read(300)
     if len(buf) != 300: break
     domid, = struct.unpack("q", buf[0:8])
