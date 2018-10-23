@@ -233,10 +233,10 @@ class FATRun:
         cursor.close()
 
     def getId(self, name):
-        if not self.fatRunCache.has_key(name):
+        if name not in self.fatRunCache:
             return None
         return self.fatRunCache[name].id
 
     def isName(self, name):
-        return self.fatRunCache.has_key(name)
+        return name in self.fatRunCache
 

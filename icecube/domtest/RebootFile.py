@@ -296,7 +296,7 @@ class RebootFile:
             key = domhub + ':' + dorcard
 
             if data.endswith('FAILURE'):
-                if not dorMap.has_key(key):
+                if key not in dorMap:
                     print 'Failure for unknown DOR entry ' + key
                     continue
 
@@ -316,7 +316,7 @@ class RebootFile:
                 if name is None:
                     name = ''
 
-                if not dorMap.has_key(key):
+                if key not in dorMap:
                     dorMap[key] = DOM(name, mbId)
 
                 dom = dorMap[key]

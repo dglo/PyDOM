@@ -35,7 +35,7 @@ class MockSysDep(HubSysDep):
         if not isinstance(jars, list):
             raise MockError, 'Argument should be a list, not ' + \
                 str(type(jars))
-        if self.expJarList.has_key(workDir):
+        if workDir in self.expJarList:
             raise MockError, 'Cannot use multiple instances of' + \
                 ' working directory "' + workDir + '"'
         self.expJarList[workDir] = jars
@@ -44,18 +44,18 @@ class MockSysDep(HubSysDep):
         self.expKillDomProcs.append(val)
 
     def addKillProcess(self, progName):
-        if self.expKillProc.has_key(progName):
+        if progName in self.expKillProc:
             self.expKillProc[progName] = self.expKillProc[progName] + 1
         else:
             self.expKillProc[progName] = 1
 
     def addStartDaemon(self, progName, pidFile):
-        if self.expStartDaemon.has_key(progName):
+        if progName in self.expStartDaemon:
             raise MockError, 'Cannot kill "' + progName + '" multiple times'
         self.expStartDaemon[progName] = pidFile
 
     def getJarList(self, workDir):
-        if not self.expJarList.has_key(workDir):
+        if workDir not in self.expJarList:
             raise MockError, 'No jar list for for "' + workDir + '"'
         list = self.expJarList[workDir]
         del self.expJarList[workDir]
@@ -69,7 +69,7 @@ class MockSysDep(HubSysDep):
         return rtnVal
 
     def killProcess(self, progName):
-        if not self.expKillProc.has_key(progName):
+        if progName not in self.expKillProc:
             raise MockError, 'Unexpected call to killProcess(' + progName + ')'
         if self.expKillProc[progName] == 1:
             del self.expKillProc[progName]
@@ -83,7 +83,7 @@ class MockSysDep(HubSysDep):
         return 'Ran dtsxall'
 
     def startDaemon(self, progName, pidFile):
-        if not self.expStartDaemon.has_key(progName):
+        if progName not in self.expStartDaemon:
             raise MockError, 'Did not expect to start "' + progName + \
                 '" daemon'
 
@@ -220,7 +220,7 @@ class testHubDaemon(unittest.TestCase):
                          str(len(expList)) + ' doms, not ' +
                          str(len(result)))
         for k in expList.keys():
-            self.failUnless(result.has_key(k), 'Could not find DOM ' + k)
+            self.failUnless(k in result, 'Could not find DOM ' + k)
             self.assertEqual(expList[k], result[k], 'Expected dom ' + str(k) +
                              ' to be "' + str(expList[k]) + '", not "' +
                              str(result[k]))

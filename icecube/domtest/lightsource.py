@@ -181,7 +181,7 @@ class perhist:
             self.var  += clkmod**2
             self.nent += 1
             bin = int(clkmod / self.bin_width)
-            if self.hist.has_key(bin) == 0:
+            if bin not in self.hist:
                 self.hist[bin] = 1
             else:
                 self.hist[bin] += 1

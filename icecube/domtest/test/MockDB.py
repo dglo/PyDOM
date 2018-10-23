@@ -181,7 +181,7 @@ class MockCursor:
                             str(type(r)) + " for result " + str(r)
                     resultList.append((r, ))
 
-        if not self.queries.has_key(qStr):
+        if qStr not in self.queries:
             if resultList is None:
                 self.queries[qStr] = None
             else:
@@ -284,7 +284,7 @@ class MockCursor:
         if len(param) > 0:
             raise ProgrammingError, "Too many parameters to execute()"
 
-        if not self.queries.has_key(operation):
+        if operation not in self.queries:
             raise ProgrammingError, "Bad query '" + str(operation) + \
                 "' for MockCursor " + self.name
 
