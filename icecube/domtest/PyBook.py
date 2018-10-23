@@ -36,7 +36,7 @@ class Histogram:
     def getMaximum(self):
         imax = 0
         hmax = self.h[0]
-        for i in xrange(1, len(self.h)):
+        for i in range(1, len(self.h)):
             if hmax < self.h[i]:
                 imax = i
                 hmax = self.h[i]

@@ -249,7 +249,7 @@ def decode_payload(f):
         num_hitrecs             = hdr[5]
 
         hits = []
-        for i in xrange(num_hitrecs):
+        for i in range(num_hitrecs):
             hdr = unpack(">HBBHI", f.read(10))
 
             rlen = hdr[0]
@@ -267,7 +267,7 @@ def decode_payload(f):
         num_trigrecs = unpack(">I", f.read(4))[0]
 
         trigrecs = []
-        for i in xrange(num_trigrecs):
+        for i in range(num_trigrecs):
             hdr = unpack(">ii4I", f.read(24))
 
             ttype = hdr[0]

@@ -265,7 +265,7 @@ def time_resolution(q, cal, pulse_period, threshold=0.0025, nseq=501, ncyc=10):
     qres = Histogram("Fast Pulse Charge Distribution DOM %s" % (id),
                      100, 0.0, 10.0)
     
-    for nc in xrange(ncyc):
+    for nc in range(ncyc):
         hqx = q.acqX(nseq, 1, 'spe')
         hqx.pop(0)
         tres_fill(hqx, cal, pulse_period, threshold,
@@ -426,7 +426,7 @@ class spefit:
         self.fit = r
         self.rss = 0.0
         n = 0
-        for i in xrange(len(self.Y)):
+        for i in range(len(self.Y)):
             if self.Y[i] != 0.0:
                 self.rss += (r[i] - self.Y[i])**2 / self.Y[i]
                 n += 1
