@@ -35,7 +35,7 @@ def usage():
                               [--set-names=file] [--rename] [--only-doms=DOM_LIST] DOMHUB_LIST
           fatconfiguration.py -H db-server -u db-user -p db-user-passwd -s site-name
                               [-t] [-v] [-f] [--no-configuration] [--add-to-fat=fat-name]
-                              [--set-names=file] [--rename] --no-scan DOM_LIST 
+                              [--set-names=file] [--rename] --no-scan DOM_LIST
 
           This scripts is used for the configuration of DOMs and in particular for the FAT DFL load configuration.
           The configuration and setup information is written to the database. The configuration includes the definition of
@@ -67,12 +67,12 @@ def usage():
 
           --no-configuration    The DOMs will not be configured. This option only makes sense, if you have the
                                 --add-to-FAT option specified.
-                                
+
           --add-to-FAT=fat-name The DOMs that are configured will be added to a FAT. The FAT identified by the given
                                 name has to be defined in the database beforehand. If no autmatic configuration is
                                 used (--no-scan option), the user will be asked for the station of the DOM.
                                 The load data written to the database is the current system date
-                                
+
           --set-names=file      The DOMs will be named during the configuration. A file is given as an argument,
                                 the names are taken from that file. The file should be a tab separated list of
                                 names. The first field is the name, the second the explanation of the name and the
@@ -83,17 +83,17 @@ def usage():
                                 an empty string '' as the file argument
 
           --rename              DOM names are overwritten with the new names from the file
-                                
+
           --only-DOMs=DOM_LIST  Only the DOMs in the DOM_LIST will be configured. The list is a string of DOM Serial numbers
                                 or DOM names separated by whitespace, e.g. 'TP5Y0001 UP5Y0002' or 'Washington Chicago Atlanta'
-                                
+
           --no-scan             With this option the DOMs to configure are specified explicitly rather than scanning a list
                                 of given domhubs for connected DOMs. The command argument has to be the list of DOMs that will
                                 be configured. The user will be prompted for the configuration settings and no automatic
                                 configuration is performed.
 
           Arguments:
-          
+
           DOMHUB_LIST and DOM_LIST are whitespace separated names of domhub or DOMs, respectively. DOM names are either the serial
           numbers or the names that have been assigned to DOMs beforehand.
 
@@ -122,7 +122,7 @@ def usage():
 
           fatconfiguration.py -H db-server -u db-user -p db-user-passwd -f -v --add-to-fat='FAT 7' \\
           --set-names='domnames.txt' domhub1
-          
+
 
           Author information: Bernhard Voigt <bernhard.voigt@desy.de>
 
@@ -130,7 +130,7 @@ def usage():
           dfl_station_connection_setup.py to define the DFL station connection mapping
           """
 
-# end def usage    
+# end def usage
 
 
 def setName(doms, names):
@@ -147,7 +147,7 @@ def setName(doms, names):
 
     if len(doms) > len(names):
         raise Exception("There are not enough names for all the DOMs which will be configured")
-    
+
     for (dom, name) in zip(doms, names):
         # only name a DOM if it has no name or the user forced renaming (command line switch)
         if dom.name is '' or rename:
@@ -164,7 +164,7 @@ def getNamesFromFile(filename):
     """
 
     names = []
-    
+
     try:
         file = open(filename, 'r')
     except IOError, error:
@@ -230,7 +230,7 @@ def configurationDialog(doms, DIALOG_SELECT):
                 changeField(dom, fields[userInput]) # hereafter show the configuration again (while loop continues)
             except ValueError, exception:
                 break # stop the loop for this DOM, we have either c or q as input
-                
+
         if userInput == 'c':
             continue
         elif userInput == 's':
@@ -243,7 +243,7 @@ def printConfiguration(dom, fields):
     """
     Prints the list of configuration fields and settings of the given dom to the screen
     Returns a list of field number to field name mappings
-    
+
     Parameters:
     dom is a DOM object
     fields is a list
@@ -259,11 +259,11 @@ def printConfiguration(dom, fields):
         fieldCounter += 1
         print "%i DOM Name: %s " % (fieldCounter, dom.name)
         fields[fieldCounter]='DOM Name'
-        
+
         fieldCounter += 1
         print "%i Name Explanation: %s " % (fieldCounter, dom.nameExplanation)
         fields[fieldCounter]='Name Explanation'
-        
+
         fieldCounter += 1
         print "%i Name Theme: %s " % (fieldCounter, dom.nameTheme)
         fields[fieldCounter]='Name Theme'
@@ -275,27 +275,27 @@ def printConfiguration(dom, fields):
     fieldCounter += 1
     print "%i DORCard: %s " % (fieldCounter, dom.dorCard)
     fields[fieldCounter] = 'DOR-Card #'
-    
+
     fieldCounter += 1
     print "%i Wire: %s " % ( fieldCounter, dom.wirePair)
     fields[fieldCounter] = 'Wire Pair #'
-    
+
     fieldCounter += 1
     print "%i Position[A|B]: %s " % (fieldCounter, dom.wirePosition)
     fields[fieldCounter] = 'Position [A|B]'
-    
+
     fieldCounter += 1
     print "%i Local Coincidence Mode [0 = no neighbor|1 = both|2 = no bottom|3 = no top]': %s " % \
           (fieldCounter, dom.localCoincidenceMode)
     fields[fieldCounter] = 'Local Coincidence Mode [0 = no neighbor|1 = both|2 = no bottom|3 = no top]'
-    
+
     fieldCounter += 1
     print "%i Maximum allowed HV: %s " % (fieldCounter, dom.maxHV)
     fields[fieldCounter] = 'Maximum HV'
 
     return fields
 # end printConfiguration
-    
+
 
 def printFatSetup(dom, fields):
     """
@@ -317,7 +317,7 @@ def printFatSetup(dom, fields):
     return fields
 # end printFatSetup
 
-    
+
 def changeField(dom, field):
     """
     Prompts the user for the value of field and sets the corresponding field of the dom object
@@ -348,7 +348,7 @@ def changeField(dom, field):
     elif field == 'Station Identifier':
         # store the id of the station rather than the given identifier
         # labName is a command line argument
-        dom.stationId = fatsetup.getStationId(db, labName, value) 
+        dom.stationId = fatsetup.getStationId(db, labName, value)
 # end changeField
 
 
@@ -359,7 +359,7 @@ def prompt(string, validItems=None):
 
     If validItems is empty any input is returned
     """
-               
+
     while True:
         input = str(raw_input(string))
         if validItems is None:
@@ -402,7 +402,7 @@ except GetoptError, e:
     print e
     usage()
     sys.exit(1)
-    
+
 # parse the options
 for option, value in options:
     if option == "-H":
@@ -446,7 +446,7 @@ mandatoryOptions = True
 if labName is None:
     print >>sys.stderr, "Command line option -s SiteName has to be specified"
     mandatoryOptions = False
-if dbHost is None: 
+if dbHost is None:
     print >>sys.stderr, "Command line option -H DatabaseHost has to be specified"
     mandatoryOptions = False
 if dbUser is None:
@@ -457,10 +457,10 @@ if dbUserPasswd is None:
     mandatoryOptions = False
 
 if not mandatoryOptions:
-    print 
+    print
     sys.exit(1)
 
-    
+
 # create the database connection
 db = MySQLdb.connect(user=dbUser, passwd=dbUserPasswd, db='domprodtest', host=dbHost)
 
@@ -509,12 +509,12 @@ if doScanning:
     if doConfiguration and doFatSetup:
         fatsetup.autoconfigure(db, doms, availableDoms, labName)
         fatsetup.autoFatSetup(db, doms, labName)
-        
+
         if doConfirmation:
             # applied bitmask to the configurationDialog method selects both dialogs:
             # configuration and setup
             configurationDialog(doms, CONFIGURATION_DIALOG | FAT_SETUP_DIALOG)
-            
+
     elif doFatSetup:
         fatsetup.autoFatSetup(db, doms, labName)
         if doConfirmation:
@@ -533,7 +533,7 @@ else:
         configurationDialog(doms, FAT_SETUP_DIALOG)
     elif doConfiguration:
         configurationDialog(doms, CONFIGURATION_DIALOG)
-        
+
 
 # store the setup and configuration
 if doFatSetup and not noSave:
@@ -545,8 +545,4 @@ if setNames and not noSave:
 
 if printSetupAndConfiguration:
     fatsetup.printSetupAndConfiguration(db, doms)
-    print 
-
-
-
-
+    print
