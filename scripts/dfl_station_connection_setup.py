@@ -11,6 +11,14 @@ import sys
 from getopt import *
 import MySQLdb
 
+
+# Python 2/3 compatibility hack
+if sys.version_info >= (3, 0):
+    read_input = input
+else:
+    read_input = raw_input
+
+
 ######################################
 #    Function definitions            #
 ######################################
@@ -66,12 +74,13 @@ def prompt(string, validItems=None):
     """
 
     while True:
-        input = str(raw_input(string))
+        response = str(read_input(string))
         if validItems is None:
-            return input
-        elif input in validItems:
-            return input
+            return response
+        elif response in validItems:
+            return response
 #end prompt
+
 
 ########################################
 #          Script execution            #
