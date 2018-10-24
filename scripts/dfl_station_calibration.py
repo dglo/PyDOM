@@ -79,7 +79,7 @@ try:
     options, arguments = getopt(sys.argv[1:],
                                 "H:u:p:s:d:vh")
 
-except GetoptError, e:
+except GetoptError as e:
     print e
     usage()
     sys.exit(1)
@@ -107,7 +107,7 @@ for option, value in options:
 try:
     filename = arguments.pop()
     f = file(filename,'r')
-except Exception, e:
+except Exception as e:
     print >>sys.stderr, "Cannot open file %s" % filename
     sys.exit(1)
 

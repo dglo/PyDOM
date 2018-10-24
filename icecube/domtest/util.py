@@ -203,7 +203,7 @@ class PMTGainCalibrator:
                                 pc = 0.02*sum(w[k-4:k+8])/self.freq*1E+06
                                 hist.fill(pc)
                                 break
-                except IBEX, ibex:
+                except IBEX as ibex:
                     print "Caught IBEX error:", ibex, "for DOM",self.q.getId()
 
             spe = spefit(hist.x(), hist.h)

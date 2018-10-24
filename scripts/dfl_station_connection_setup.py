@@ -110,7 +110,7 @@ try:
                                 "H:u:p:s:hvf",
                                 ['breakoutbox='])
 
-except GetoptError, e:
+except GetoptError as e:
     print e
     usage()
     sys.exit(1)
@@ -139,7 +139,7 @@ for option, value in options:
 # get the stationidentifier
 try:
     stationIdentifier = arguments.pop()
-except Exception, e:
+except Exception as e:
     if not printMapping:
         raise e
 
@@ -148,7 +148,7 @@ try:
     (domhub, rest) = arguments.pop().split('.')
     (dorCard, wirePair, wirePosition) = list(rest)
     wirePosition = wirePosition.upper()
-except Exception, e:
+except Exception as e:
     if not printMapping:
         raise e
 
@@ -161,7 +161,7 @@ if stationIdentifier is not None and domhub is not None:
     # get the station id
     try:
         stationId = fatsetup.getStationId(db, labName, stationIdentifier)
-    except Exception, e:
+    except Exception as e:
         if not confirm:
             userInput = 'y'
         else:
@@ -173,7 +173,7 @@ if stationIdentifier is not None and domhub is not None:
             try:
                 stationId = fatsetup.insertStation(db, labName, stationIdentifier)
                 print "Station %s created!" % stationIdentifier
-            except Exception, e:
+            except Exception as e:
                 print e
                 print >>sys.stderr, "Could not insert the Station into the database!"
                 sys.exit(1)
@@ -184,7 +184,7 @@ if stationIdentifier is not None and domhub is not None:
 
         connectionId = fatsetup.getConnectionId(db, labName, domhub, dorCard, wirePair,
                                                 wirePosition, breakoutbox, breakoutboxConnector)
-    except Exception, e:
+    except Exception as e:
         if not confirm:
             userInput = 'y'
         else:
@@ -197,7 +197,7 @@ if stationIdentifier is not None and domhub is not None:
                 connectionId = fatsetup.insertConnection(db, labName, domhub, dorCard, wirePair,
                                                          wirePosition, breakoutbox, breakoutboxConnector)
                 print "Connection %s.%s%s%s created!" % (domhub, dorCard, wirePair, wirePosition)
-            except Exception, e:
+            except Exception as e:
                 print e
                 print >>sys.stderr, "Could not insert the connection into the database!"
                 sys.exit(1)
@@ -206,7 +206,7 @@ if stationIdentifier is not None and domhub is not None:
         fatsetup.mapStationToConnection(db, stationId, connectionId)
         print "Mapped station %s to connection %s.%s%s%s" % (stationIdentifier, domhub, dorCard, wirePair, wirePosition)
 
-    except Exception, e:
+    except Exception as e:
         print e
         print >>sys.stderr, "Could not map station %s to connection %s.%s%s%s" % \
               (stationIdentifier, domhub, dorCard, wirePair, wirePosition)

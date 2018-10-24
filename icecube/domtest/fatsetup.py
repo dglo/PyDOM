@@ -242,7 +242,7 @@ def scanHubs(db, domhubList):
             try:
                 # use the functions provided by the DOMConfigruator class to get the DOM that integrates the mainboard
                 conf = DOMConfigurator(db, mbId)
-            except DOMConfigurationException, e:
+            except DOMConfigurationException as e:
                 # there is no DOM related to the mainboard
                 # the function findDOM tries to figure out whether the is a misrelated mainboard
                 # that has a typo in the serial number.  Also, the user can enter the DOM Serial number
@@ -766,7 +766,7 @@ def insertConnection(db, labName, domhub, dorCard, wirePair,
               """
         cursor.execute(sql, (breakoutbox, breakoutboxConnector, connectionId))
         
-    except Exception, e:
+    except Exception as e:
         print e
         # no connection found, insert a new one
 
