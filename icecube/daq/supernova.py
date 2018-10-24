@@ -26,7 +26,7 @@ class SNPayloadReader:
     def __iter__(self):
         return self
         
-    def next(self):
+    def __next__(self):
         while True:
             hdr = self.f.read(16)
             if len(hdr) == 0: raise StopIteration
