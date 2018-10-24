@@ -194,7 +194,7 @@ class testDOMProdTestDB(unittest.TestCase):
         try:
             id = dptDB.getLabId(hostName)
             self.fail("Expected getLabId(" + hostName + ") to fail")
-        except IOError, msg:
+        except IOError as msg:
             pass # expect this to fail
 
     def testGetLabIdRtnMach(self):

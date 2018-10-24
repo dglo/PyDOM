@@ -251,7 +251,7 @@ class ibx:
                 if len(si) > 0:
                     try:
                         prompt = self.s.recv(_CHUNKSIZE)
-                    except socket.error, msg:
+                    except socket.error as msg:
                         raise socket.error, 'Socket Error for ' + \
                             self.portString() + ': ' + str(msg)
                     #print "PROMPT[I]:",prompt
@@ -281,7 +281,7 @@ class ibx:
             if len(si) > 0:
                 try:
                     msg += self.s.recv(_CHUNKSIZE)
-                except socket.error, msg:
+                except socket.error as msg:
                     raise socket.error, 'Socket Error for ' + \
                         self.portString() + ': ' + str(msg)
             else:
@@ -303,7 +303,7 @@ class ibx:
                 raise IBEX, 'Timeout Error for ' + self.portString()
             try:
                 rmadd = self.s.recv(_CHUNKSIZE)
-            except socket.error, msg:
+            except socket.error as msg:
                 raise socket.error, 'Socket Error for ' + \
                     self.portString() + ': ' + str(msg)
             if DEBUG_LEVEL > 5:

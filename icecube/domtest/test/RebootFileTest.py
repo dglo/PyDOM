@@ -129,7 +129,7 @@ class testDOM(unittest.TestCase):
                 dom.insert(dptDB, rebootId, fatId)
                 if i == 0:
                     self.fail('Expected unknown Product to fail')
-            except ValueError, data:
+            except ValueError as data:
                 if i > 0:
                     self.fail('Did not expect insert to fail: ' +
                               str(data))

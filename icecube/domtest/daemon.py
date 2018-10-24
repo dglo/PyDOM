@@ -52,7 +52,7 @@ def create(inFile='/dev/null', outFile='/dev/null', errFile='/dev/null',
         # impossible for its PID to equal its
         # PGID.
         pid = os.fork()
-    except OSError, e:
+    except OSError as e:
         return((e.errno, e.strerror))     # ERROR (return a tuple)
 
     if (pid != 0):
@@ -87,7 +87,7 @@ def handle_action(action, inFile='/dev/null', outFile='/dev/null',
             while True:
                 os.kill(pid, signal.SIGTERM)
                 time.sleep(1)
-        except OSError, err:
+        except OSError as err:
             err = str(err)
             if err.find("No such process") > 0:
                 os.remove(pidFile)
@@ -109,7 +109,7 @@ def run(cmdStr, inFile='/dev/null', outFile='/dev/null', errFile='/dev/null',
     """Run the specified command as a daemon."""
     try:
         pid = os.fork()
-    except OSError, e:
+    except OSError as e:
         return((e.errno, e.strerror))     # ERROR (return a tuple)
 
     if pid == 0:
@@ -159,14 +159,14 @@ def start_child(pidFile=None):
         # longer a session leader, thus preventing the daemon from ever
         # acquiring a controlling terminal.
         pid = os.fork()
-    except OSError, e:
+    except OSError as e:
         return((e.errno, e.strerror))
 
     if (pid != 0):     # The second parent
         if pidFile is not None:
             try:
                 open(pidFile,'w').write("%d" % pid)
-            except IOError, err:
+            except IOError as err:
                 sys.stderr.write("Couldn't create PID file \"%s\"\n" % pidFile)
 
         os._exit(0)    # Exit parent (the first child) of the second child.

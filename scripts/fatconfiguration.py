@@ -174,7 +174,7 @@ def getNamesFromFile(filename):
 
     try:
         file = open(filename, 'r')
-    except IOError, error:
+    except IOError as error:
         print "Could not open %s for reading the DOM names" % filename
         return
 
@@ -235,7 +235,7 @@ def configurationDialog(doms, DIALOG_SELECT):
             try:
                 userInput = int(userInput)
                 changeField(dom, fields[userInput]) # hereafter show the configuration again (while loop continues)
-            except ValueError, exception:
+            except ValueError as exception:
                 break # stop the loop for this DOM, we have either c or q as input
 
         if userInput == 'c':
@@ -405,7 +405,7 @@ try:
                                 ['add-to-fat=', 'only-doms=', 'set-names=',
                                  'no-configuration', 'no-scan', 'rename'])
 
-except GetoptError, e:
+except GetoptError as e:
     print e
     usage()
     sys.exit(1)
@@ -480,7 +480,7 @@ else:
     # scan for the DOMs connected to the hubs given to the script in the argument list
     try:
         availableDoms = fatsetup.scanHubs(db, arguments)
-    except Exception, e:
+    except Exception as e:
         print >>sys.stderr, "Could not connect to one of the given domhubs: %s" % arguments
         print >>sys.stderr, e
         sys.exit(1)
@@ -502,7 +502,7 @@ else:
 if setNames and domNames is not None:
     try:
         setName(doms, domNames)
-    except Exception, e:
+    except Exception as e:
         print e
         userInput = prompt("Continue (c) Abort(q): ")
         if userInput == 'c':
