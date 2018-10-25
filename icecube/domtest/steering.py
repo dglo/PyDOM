@@ -31,7 +31,7 @@ def emit_doms(doms, db, trigMode=2, atwd=0, mux=2, led=0, \
             print >>sys.stderr, "WARNING: DOM %s not in testing database" % (domid)
         else:
             print >>str, "  <dom domId='%s' name='%s' domhub='%s' card='%d' pair='%d' ab='%s'>" % \
-                  ((domid,r[16]) + tuple(loc))
+                  ((domid, r[16]) + tuple(loc))
             if (r[16] == domname):
               print >>str, "    <param name='NUM_SAMPLES' atwdChannel='0' value='0'/>"
               print >>str, "    <param name='SAMPLE_SIZE' atwdChannel='0' value='2'/>"
@@ -69,7 +69,7 @@ def emit_doms(doms, db, trigMode=2, atwd=0, mux=2, led=0, \
             print >>str, "    <param name='DAC_PMT_FE_PEDESTAL' value='%d'/>" % (r[7])
             print >>str, "    <param name='DAC_FAST_ADC_REF' value='%d'/>" % (r[8])
             if spe != None:
-              if (re.search('(?<=DOM)',r[16])):
+              if (re.search('(?<=DOM)', r[16])):
 #                print " found a match for %s " % r[16]
                 print >>str, "    <param name='DAC_SINGLE_SPE_THRESH' value='%d'/>" % (r[9])
               else:
@@ -96,7 +96,7 @@ def emit_doms(doms, db, trigMode=2, atwd=0, mux=2, led=0, \
 #               icetophub1 = 'sps-ithub-cont01'
 #               print >>str, "*%s* *%d*" % (thishub, thispair)
                if hvsetting != None:
-                 if (re.search('(?<=DOM)',r[16])):
+                 if (re.search('(?<=DOM)', r[16])):
                    voltage = 0
                  elif ( hvsetting == 0):
                    voltage = r[20]
@@ -112,7 +112,7 @@ def emit_doms(doms, db, trigMode=2, atwd=0, mux=2, led=0, \
                    print "the hvsetting for DOM %s is suspect %d" % (r[16], hvsetting)
                    voltage = 0
                else:
-                 if (re.search('(?<=DOM)',r[16])):
+                 if (re.search('(?<=DOM)', r[16])):
                    voltage = 0
                  elif ( r[15] == 0 ):
                    voltage = r[20]

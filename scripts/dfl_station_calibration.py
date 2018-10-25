@@ -106,7 +106,7 @@ for option, value in options:
 # and try to read it
 try:
     filename = arguments.pop()
-    f = file(filename,'r')
+    f = file(filename, 'r')
 except Exception as e:
     print >>sys.stderr, "Cannot open file %s" % filename
     sys.exit(1)

@@ -2,7 +2,7 @@
 #
 # Parse histo-clean (monitoring) data
 
-import os,sys
+import os, sys
 from icecube.domtest.DOMProdTestDB import DOMProdTestDB, FATRun
 from icecube.domtest.LCChainFile import LCChainFile
 from icecube.domtest.MonitorFile import MonitorFile

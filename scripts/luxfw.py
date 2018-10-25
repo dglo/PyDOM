@@ -24,7 +24,7 @@ time.sleep(5.0)
 logf = file(os.path.expanduser("~/monitoring/lux.log"), "a")
 print >>logf, "%.1f RUN BEGIN" % (time.time())
 
-for pos in range(1,5):
+for pos in range(1, 5):
     fw.setPosition(pos)
     time.sleep(5.0)
     

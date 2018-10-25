@@ -219,7 +219,7 @@ def configurationDialog(doms, DIALOG_SELECT):
 
             # prompt the user whether something should be changed
             # valid input is a list of numbers for the fields to select and 'c' and 'q'
-            validInput = [str(i) for i in range(1,len(fields)+1)]
+            validInput = [str(i) for i in range(1, len(fields)+1)]
             validInput.append('c')
             validInput.append('q')
             validInput.append('s')

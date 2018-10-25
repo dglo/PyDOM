@@ -543,7 +543,7 @@ def storeFatSetup(db, doms, fatName, labName, loadDate=time.strftime('%Y-%m-%d %
           WHERE f.name=%s AND
           l.name=%s 
           """
-    if not cursor.execute(sql, (fatName,labName)):
+    if not cursor.execute(sql, (fatName, labName)):
         raise Exception('No FAT named %s found in the database' % fatName)
     
     fatId = cursor.fetchone()[0]

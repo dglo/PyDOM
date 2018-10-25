@@ -563,7 +563,7 @@ class ibx:
         clk = self.send('%s @ . drop %s @ . drop' % (
             forthHex(FPGA_CLOCK_LOW),
             forthHex(FPGA_CLOCK_HI))).split()
-        return long(clk[0]) + pow(2,32) * long(clk[1])
+        return long(clk[0]) + pow(2, 32) * long(clk[1])
         
 def unpack_octal_dump(zlist):
     qlist = []

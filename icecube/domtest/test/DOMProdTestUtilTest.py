@@ -79,7 +79,7 @@ class testDOMProdTestUtil(unittest.TestCase):
             for u in "EKPVX":
                 for y in "3456789ABCD":
                     for l in "PHY":
-                        for n in range(1,10000,666):
+                        for n in range(1, 10000, 666):
                             serial = '%c%c%c%c%04d' % (c, u, y, l, n)
                             self.assert_(isDOMSerial(serial),
                                          "Should have recognized " + serial)

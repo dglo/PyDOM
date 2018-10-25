@@ -2,7 +2,7 @@
 #
 # Read monitor data and save it to the database
 
-import os,re,sys
+import os, re, sys
 import DOMProdTestUtil
 from DOMProdTestDB import DOMProdTestDB, FATRun
 
@@ -146,7 +146,7 @@ class MonData:
         for val in self.histo:
             cursor.execute('insert into FATMonHisto(' +
                            'fat_mondata_id,bin,value)values(%d,%d,%d)' %
-                           (dataId,bin,val))
+                           (dataId, bin, val))
             bin = bin + 1
 
         cursor.close()

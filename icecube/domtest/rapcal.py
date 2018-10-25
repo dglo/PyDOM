@@ -208,7 +208,7 @@ class TimeCalibrator:
         # if the DOR GPS clock count is off by more than 10 seconds
         # the entry is wrong, use one of the previous once
         # try the last four
-        for previous in range(2,6):
+        for previous in range(2, 6):
             previousRcl = rcl[ixrc-previous]
             if abs(hit.utclk - hit.gpsClock) / 10e10 > 10:
                 hit.gpsClock = previousRcl.dorGPSClock

@@ -2,7 +2,7 @@
 #
 # Read cold-reboot data and save it to the database
 
-import re,sys,time
+import re, sys, time
 import DOMProdTestUtil
 import _mysql_exceptions
 

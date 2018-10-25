@@ -2,7 +2,7 @@
 #
 # Tell HubDaemon to stop all processes which may be using a DOM
 
-import os,sys,traceback
+import os, sys, traceback
 from icecube.domtest.HubDaemon import HubProxy
 from xmlrpclib import Error
 
@@ -14,9 +14,9 @@ for s in sys.argv[1:]:
     try:
         driver = HubProxy(s)
 
-        print s,"kill dom processes"
+        print s, "kill dom processes"
         l = driver.killDomProcesses()
         print l
 
     except Error:
-        print "For ",s,traceback.print_exc()
+        print "For ", s, traceback.print_exc()

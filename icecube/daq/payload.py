@@ -48,10 +48,10 @@ class EventPayload(Payload):
             txt += "%d/%d-%d" % (self.run_number, self.subrun_number, self.uid)
         txt += " ival=(%d, %d)\n" % self.interval
         if self.trigger_request is not None:
-            txt += indent(str(self.trigger_request),4)
+            txt += indent(str(self.trigger_request), 4)
         if self.trigger_records is not None:
             for tr in self.trigger_records:
-                txt += indent(str(tr),4)
+                txt += indent(str(tr), 4)
         return txt
 
     def getTriggers(self):
@@ -92,9 +92,9 @@ class TriggerRequestPayload(Payload):
         txt = "[TriggerRequestPayload]: source=%s trigtype=%d\n" % \
             (source_str(self.srcid), self.trigger_type)
         for ex in self.readout_request.elements:
-            txt += indent(str(ex),4)
+            txt += indent(str(ex), 4)
         for h in self.hits:
-            txt += indent(str(h),4)
+            txt += indent(str(h), 4)
         txt += '--'
         return txt
 
@@ -169,7 +169,7 @@ class TriggerRecord(object):
         txt = "[TriggerRecord]: source=%s trigtype=%d\n" % \
             (source_str(self.srcid), self.trigger_type)
         for h in self.hits:
-            txt += indent(str(h),4)
+            txt += indent(str(h), 4)
         txt += '--'
         return txt
 

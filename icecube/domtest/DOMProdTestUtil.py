@@ -2,7 +2,7 @@
 #
 # 'domprodtest' database utility methods
 
-import MySQLdb,os,re
+import MySQLdb, os, re
 
 ###############################################################################
 

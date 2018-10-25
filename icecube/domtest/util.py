@@ -80,7 +80,7 @@ def configDefault(q, hvon=0):
             hv = config.getint('Nominal HV', q.getId())
         except:
             print >> sys.stderr, 'WARNING in util.configDefault() - cannot ' \
-                  + 'find default HV for DOM ID',q.getId()
+                  + 'find default HV for DOM ID', q.getId()
             hv = 2800
         q.setHV(hv)
     else:
@@ -204,7 +204,7 @@ class PMTGainCalibrator:
                                 hist.fill(pc)
                                 break
                 except IBEX as ibex:
-                    print "Caught IBEX error:", ibex, "for DOM",self.q.getId()
+                    print "Caught IBEX error:", ibex, "for DOM", self.q.getId()
 
             spe = spefit(hist.x(), hist.h)
             self.dataPoint.append((hv, hist, spe))
@@ -216,8 +216,8 @@ class PMTGainCalibrator:
             self.charge_dist.append((hist, spe))
             
         self.c = linear_least_squares(
-            array(self.logHV,'d'),
-            array(self.logGain,'d')
+            array(self.logHV, 'd'),
+            array(self.logGain, 'd')
             )
 
 def tres_fill(hits, cal, offset, threshold, bias, freq, hres, qres=None):
@@ -258,7 +258,7 @@ def time_resolution(q, cal, pulse_period, threshold=0.0025, nseq=501, ncyc=10):
     tres_fill(hqx, cal, pulse_period, threshold, bias, freq, that)
 
     tmax, bin = that.getMaximum()
-    print "TRES Correction:",tmax, bin
+    print "TRES Correction:", tmax, bin
     
     hres = Histogram("Time Resolution - DOM %s - Pulse Period %.3g" \
                      % (id, pulse_period), 100, bin-10, bin+10)
@@ -388,7 +388,7 @@ class spefit:
         for x0 in range(len(y)):
             if y[x0] > thr:
                 break
-        for x1 in range(len(y)-1,-1,-1):
+        for x1 in range(len(y)-1, -1, -1):
             if y[x1] > thr:
                 break
 
@@ -465,7 +465,7 @@ class spefit:
         
         # Ask for concave up followed by concave down that is max
         dd = d[1:] * arange(1, len(d))
-        self.xz = [ (z,polyval(self.b, z),polyval(dd, z) > 0) for z in rz ]
+        self.xz = [ (z, polyval(self.b, z), polyval(dd, z) > 0) for z in rz ]
 
         if len(self.xz) == 2:
             # Two real zeros found - easy to ID min and max

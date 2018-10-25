@@ -3,7 +3,7 @@
 # Look up a DOM/main board by various identifiers
 
 import MySQLdb
-import re,sys
+import re, sys
 import icecube.domtest.DOMProdTestUtil as DOMProdTestUtil
 from icecube.domtest.DOMProdTestDB import DOMProdTestDB
 
@@ -14,7 +14,7 @@ TYPEKEY_MB = 'Main'
 
 def dumpAssembly(row, spaces, showIds):
     """Dump Assembly row"""
-    (assemId,prodId,techId,dateTime) = row
+    (assemId, prodId, techId, dateTime) = row
 
     if not showIds:
         idStr = ''
@@ -27,7 +27,7 @@ def dumpDOM(db, hardSerial, tagSerial, showIds):
     """Dump DOM data"""
     domList = fetchProdByTypeSerial(db, TYPEKEY_DOM, hardSerial, tagSerial)
     for row in domList:
-        (prodId,hardSerial,newTag,type) = row
+        (prodId, hardSerial, newTag, type) = row
         dumpProduct(row, '', showIds)
 
         name = fetchDOMNameByProdId(db, prodId)
@@ -39,7 +39,7 @@ def dumpDOM(db, hardSerial, tagSerial, showIds):
             print '  No Assembly rows' 
         else:
             for row in assemList:
-                (assemId,aProdId,techId,datetime) = row
+                (assemId, aProdId, techId, datetime) = row
                 dumpAssembly(row, '  ', showIds)
                 apList = fetchAssemProdByAssemId(db, assemId)
                 if len(apList) == 0:
@@ -61,7 +61,7 @@ def dumpMB(db, hardSerial, tagSerial, showIds):
     """Dump Main Board data"""
     mbList = fetchProdByTypeSerial(db, TYPEKEY_MB, hardSerial, tagSerial)
     for row in mbList:
-        (prodId,newHard,newTag,type) = row
+        (prodId, newHard, newTag, type) = row
         dumpProduct(row, '', showIds)
 
         apList = fetchAssemProdByProdId(db, prodId)
@@ -78,20 +78,20 @@ def dumpMB(db, hardSerial, tagSerial, showIds):
                     print '  No Assembly rows'
                 else:
                     for row in list:
-                        (xAssemId,xProdId,xTechId,xDateTime) = row
+                        (xAssemId, xProdId, xTechId, xDateTime) = row
                         dumpAssembly(row, '  ', showIds)
                         subList = fetchProdByProdId(db, xProdId)
                         for row in subList:
                             dumpProduct(row, '    ', showIds)
 
-                            (domProdId,domHard,domTag,domType) = row
+                            (domProdId, domHard, domTag, domType) = row
                             name = fetchDOMNameByProdId(db, domProdId)
                             if name is not None:
                                 print '    Name ' + name
 
 def dumpProduct(row, spaces, showIds):
     """Dump Product row"""
-    (prodId,hardSerial,tagSerial,typeName) = row
+    (prodId, hardSerial, tagSerial, typeName) = row
 
     if hardSerial is None or hardSerial == '':
         hardStr = ''
@@ -121,8 +121,8 @@ def fetchAssemByAssemId(db, assemId):
         if row is None:
             break
 
-        (prodId,techId,datetime) = row
-        list.append((assemId,prodId,techId,datetime))
+        (prodId, techId, datetime) = row
+        list.append((assemId, prodId, techId, datetime))
 
     cursor.close()
 
@@ -141,8 +141,8 @@ def fetchAssemByProdId(db, prodId):
         if row is None:
             break
 
-        (assemId,techId,datetime) = row
-        list.append((assemId,prodId,techId,datetime))
+        (assemId, techId, datetime) = row
+        list.append((assemId, prodId, techId, datetime))
 
     cursor.close()
 
@@ -233,8 +233,8 @@ def fetchProdByProdId(db, prodId):
         if row is None:
             break
 
-        (hardSerial,tagSerial,typeName) = row
-        list.append((prodId,hardSerial,tagSerial,typeName))
+        (hardSerial, tagSerial, typeName) = row
+        list.append((prodId, hardSerial, tagSerial, typeName))
 
     cursor.close()
 
@@ -273,8 +273,8 @@ def fetchProdByTypeSerial(db, typeName, hardSerial, tagSerial):
         if row is None:
             break
 
-        (prodId,newHard,newTag,newType) = row
-        list.append((prodId,newHard,newTag,newType))
+        (prodId, newHard, newTag, newType) = row
+        list.append((prodId, newHard, newTag, newType))
 
     cursor.close()
 
@@ -286,7 +286,7 @@ db = DOMProdTestDB()
 
 showIds = False
 
-for a in range(1,len(sys.argv)):
+for a in range(1, len(sys.argv)):
     arg = sys.argv[a]
     if arg == '-i':
         showIds = True
