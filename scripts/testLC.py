@@ -129,7 +129,7 @@ class dom_harness:
             if self.rapcal_ok:
                 h.utclk = self.rapcal.dom2UT(h.domclk)
             else:
-                h.utclk = -1L
+                h.utclk = -1
             hits.append(h)
             w = w[nb:]
         return hits

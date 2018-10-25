@@ -3,8 +3,8 @@
 import sys
 from struct import unpack
 
-def MonitorRecordFactory(buf, domid='????????????', timestamp=0L):
-    domClock = 0L
+def MonitorRecordFactory(buf, domid='????????????', timestamp=0):
+    domClock = 0
     for i in range(6):
         domClock = (domClock << 8) | unpack('B', buf[i+4])[0]
     (moniLen, moniType) = unpack('>hh', buf[0:4])
@@ -221,7 +221,7 @@ def readMoniStreamDH(f):
             xroot[domid] = [ ]
         while len(buf) > 0:
             blen, = unpack('>h', buf[0:2])
-            moni = MonitorRecordFactory(buf[0:blen], domid, -1L)
+            moni = MonitorRecordFactory(buf[0:blen], domid, -1)
             buf  = buf[blen:]
             xroot[domid].append(moni)
         

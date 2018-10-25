@@ -149,9 +149,9 @@ class hit:
             ((fmt & 1 != 0) * 0x0f) + ((fmt & 2 != 0) * 0xf0),
             ((fmt & 4 != 0) * 0x0f) + ((fmt & 8 != 0) * 0xf0),
             self.trigmode, 0, 
-            (self.clock0 & 0xff0000000000L) >> 40,
-            (self.clock0 & 0x00ff00000000L) >> 32,
-            self.clock0 & 0xffffffffL)
+            (self.clock0 & 0xff0000000000) >> 40,
+            (self.clock0 & 0x00ff00000000) >> 32,
+            self.clock0 & 0xffffffff)
         # Write FADC
         for i in range(nfadc << 4):
             eng = eng + struct.pack('>H', self.fadc[i])

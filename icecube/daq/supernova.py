@@ -15,9 +15,9 @@ class SNData:
         self.mbid = '%12.12x' % mbid
         self.utc  = utc
         self.scalers = unpack('%dB' % (bytes - 10), data[10:])
-        self.domclk  = ((((t5 << 8L | t4) << 8L | t3) \
-            << 8L | t2) << 8L | t1) << 8L | t0
-        self.utcend  = self.utc + len(self.scalers) * 16384000L
+        self.domclk  = ((((t5 << 8 | t4) << 8 | t3) \
+            << 8 | t2) << 8 | t1) << 8 | t0
+        self.utcend  = self.utc + len(self.scalers) * 16384000
         
 class SNPayloadReader:
     def __init__(self, f):
@@ -43,8 +43,8 @@ def procsn(f, holdoff=10000):
     
     a = [ 0 ] * 1000
     ta = None
-    da = 5000000000L
-    db = 16384000L
+    da = 5000000000
+    db = 16384000
     
     while True:
         hdr = f.read(24)
@@ -54,7 +54,7 @@ def procsn(f, holdoff=10000):
         mbid = "%12.12x" % mbid
         s = SNData(hdr + buf)
         mtim[mbid] = s.utcend
-        if ta is None: ta = s.utc / 10000000000L * 10000000000L
+        if ta is None: ta = s.utc / 10000000000 * 10000000000
         rebin(a, ta, da, s.scalers, s.utc, db)
         hold += 1
     

@@ -65,7 +65,7 @@ def scola_spacca(hits, nick):
         spacca[astrid].append((stomid, tijd))
     return spacca
 
-def string_trigger(hits, mult, clen, twin=15000L, topVeto=0, bottomVeto=60):
+def string_trigger(hits, mult, clen, twin=15000, topVeto=0, bottomVeto=60):
     """
     Do string triggering on list of hits which must be time-ordered list
     of triplets with hits[i] = (module, utc)
