@@ -2,7 +2,7 @@
 #
 # Tell HubDaemon to get DOMs ready for a TestDAQ run
 
-import os,sys,traceback
+import os, sys, traceback
 from icecube.domtest.HubDaemon import HubProxy
 from xmlrpclib import Error
 
@@ -14,7 +14,7 @@ for s in sys.argv[1:]:
     try:
         driver = HubProxy(s)
 
-        print s,"ready"
+        print s, "ready"
         driver.ready()
     except Error:
-        print "For ",s,traceback.print_exc()
+        print "For ", s, traceback.print_exc()

@@ -2,7 +2,7 @@
 #
 # functions for starting a Unix daemon
 
-import os,signal,sys,time
+import os, signal, sys, time
 import traceback
 
 def close_all_files():
@@ -67,7 +67,7 @@ def create(inFile='/dev/null', outFile='/dev/null', errFile='/dev/null',
 def get_pid(pidFile):
     """Get process ID from the PID file."""
     try:
-        pf  = file(pidFile,'r')
+        pf  = file(pidFile, 'r')
         pid = int(pf.read().strip())
         pf.close()
     except IOError:
@@ -165,7 +165,7 @@ def start_child(pidFile=None):
     if (pid != 0):     # The second parent
         if pidFile is not None:
             try:
-                open(pidFile,'w').write("%d" % pid)
+                open(pidFile, 'w').write("%d" % pid)
             except IOError as err:
                 sys.stderr.write("Couldn't create PID file \"%s\"\n" % pidFile)
 

@@ -2,7 +2,7 @@
 #
 # Read lcchain data and save it to the database
 
-import re,sys
+import re, sys
 
 STATE_BOGUS = 0
 STATE_OUTER = 1

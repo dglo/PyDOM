@@ -289,7 +289,7 @@ class FitGetter(ContentHandler):
             log("set state to 0")
             self.intercept = float(self.inter_string)
             self.slope = float(self.slope_string)
-        if name == 'param' and self.state in (2,3):
+        if name == 'param' and self.state in (2, 3):
             self.state = 1
             
     def characters(self, content):

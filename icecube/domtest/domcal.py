@@ -147,8 +147,8 @@ class calibrator:
         self.atwd_intercept = [ None ] * 8
         self.atwd_slope     = [ None ] * 8
         for ch in (0, 1, 2, 4, 5, 6):
-            self.atwd_intercept[ch] = zeros(128,'d')
-            self.atwd_slope[ch]     = zeros(128,'d')
+            self.atwd_intercept[ch] = zeros(128, 'd')
+            self.atwd_slope[ch]     = zeros(128, 'd')
             for bin in range(128):
                 self.atwd_intercept[ch][bin] = self.atwd_fit[ch][bin].getParam("intercept")
                 self.atwd_slope[ch][bin] = self.atwd_fit[ch][bin].getParam("slope")
@@ -319,7 +319,7 @@ class calibrator:
         fadcped = 0
         n = 0
         for h in hqx:
-            fadcped += sum(array(h.fadc,'d'))
+            fadcped += sum(array(h.fadc, 'd'))
             n += len(h.fadc)
         fadcped /= n
 
@@ -386,7 +386,7 @@ class calibrator:
         for bias in range(1000, 2000, 100):
             q.setDAC(7, bias)
             time.sleep(5.0)
-            ped = [ zeros(128,'d') for ch in range(8) ]
+            ped = [ zeros(128, 'd') for ch in range(8) ]
             hqx = q.acqX(101, 0x07, 'cpu')
             hqx.pop(0)
             hqy = q.acqX(101, 0x70, 'cpu')
@@ -416,7 +416,7 @@ class calibrator:
                     #    f.write("%.2f %.2f\n" % pair)
                     # f.close()
                 self.atwd_fit[ch][bin] = Fit(
-                    "linear", regression(array(a,'d'), array(v,'d')))
+                    "linear", regression(array(a, 'd'), array(v, 'd')))
                 
     def amplifiercal(self, q):
 
@@ -495,7 +495,7 @@ if __name__ == "__main__":
     q.setHV(0)
     q.disableHV()
 
-    calfile = os.path.join(dir,time.strftime("%Y%m%d%H%M")) + ".xdc"
+    calfile = os.path.join(dir, time.strftime("%Y%m%d%H%M")) + ".xdc"
     
     # Do the live calibration
     cal = calibrator(q)

@@ -167,7 +167,7 @@ if stationIdentifier is not None and domhub is not None:
         else:
             userInput = str()
             userInput = prompt("No station %s found in the database! Do you want to insert it [y|n]?" % stationIdentifier,
-                       ('y','n'))
+                       ('y', 'n'))
 
         if userInput == 'y':
             try:
@@ -190,7 +190,7 @@ if stationIdentifier is not None and domhub is not None:
         else:
             userInput = str()
             userInput = prompt("No connection %s.%s%s%s found in the database! Do you want to insert it [y|n]?" % \
-                               (domhub, dorCard, wirePair, wirePosition), ('y','n'))
+                               (domhub, dorCard, wirePair, wirePosition), ('y', 'n'))
 
         if userInput == 'y':
             try:

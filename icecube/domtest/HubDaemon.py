@@ -2,7 +2,7 @@
 #
 # DOMHub XML-RPC daemon
 
-import os,re,signal,socket,string,sys,traceback
+import os, re, signal, socket, string, sys, traceback
 from xmlrpclib import ServerProxy
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
@@ -24,14 +24,14 @@ class XMLServer(SimpleXMLRPCServer):
     """Augmented XML-RPC server class"""
 
     def __init__(self, *args):
-        SimpleXMLRPCServer.__init__(self,(args[0],args[1]))
+        SimpleXMLRPCServer.__init__(self, (args[0], args[1]))
 
     def server_bind(self):
         """Mark the socket reuseable (for debugging)"""
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         SimpleXMLRPCServer.server_bind(self)
 
-    def verify_request(self,request, client_address):
+    def verify_request(self, request, client_address):
         """
         if access_list is defined,
         only allow hosts in that list to make requests
@@ -202,7 +202,7 @@ class HubDaemon:
 
     def _dispatch(self, method, params):
         """Hack around Linux python bug"""
-        return apply(getattr(self,method), params)
+        return apply(getattr(self, method), params)
 
     def disableBlocking(self):
         """Disable blocking"""

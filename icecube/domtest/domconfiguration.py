@@ -82,7 +82,7 @@ def getDefaultDACSettings():
     """
     settings = []
     for i in range(16):
-        settings.insert(i,getDefaultDACSetting(i))
+        settings.insert(i, getDefaultDACSetting(i))
 
     return settings
 #end getDefaultDACSettings
@@ -332,7 +332,7 @@ class DOMConfigurator:
         settings = []
         for row in result:
             if row[1] == 0:
-                settings.insert(row[0],getDefaultDACSetting(row[0]))
+                settings.insert(row[0], getDefaultDACSetting(row[0]))
             else:
                 settings.insert(int(row[0]), int(row[1]))
         return settings
@@ -405,7 +405,7 @@ class DOMConfigurator:
         # DOMCal calculates the function log(gain) = intercept + slope * log(hv[V])
         # to get the HV in Volts the function has to be inverted and the result has
         # to be taken as the power of 10 i.e. hv[V] = 10^((log(gain) - intercept)/slope)
-        return int(round(math.pow(10,( (math.log10(gain)-intercept) / slope ))))
+        return int(round(math.pow(10, ( (math.log10(gain)-intercept) / slope ))))
     #end getHV
 
     def getConfigurationDates(self):

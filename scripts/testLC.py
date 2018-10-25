@@ -175,14 +175,14 @@ if __name__ == "__main__":
     dom_up.app.setLC(mode=3,
                      transmit=2,
                      type=2,
-                     window=(500,500),
+                     window=(500, 500),
                      cablelen=8*(500,),
                      span=1
                      )
     dom_dn.app.setLC(mode=2,
                      transmit=1,
                      type=2,
-                     window=(1500,1500),
+                     window=(1500, 1500),
                      cablelen=8*(500,),
                      span=1
                      )
@@ -212,7 +212,7 @@ if __name__ == "__main__":
     print "up rate:", calc_rate(hup)
     print "dn rate:", calc_rate(hdn)
     hits = hup + hdn
-    hits.sort(lambda x,y: cmp(x.utclk, y.utclk))
+    hits.sort(lambda x, y: cmp(x.utclk, y.utclk))
 
     nlc = 0
     flog = file('testLC.dat', 'w')

@@ -86,7 +86,7 @@ class Driver:
     
     def _dispatch(self, method, params):
         """Hack around Linux python bug"""
-        return apply(getattr(self,method), params)
+        return apply(getattr(self, method), params)
 
     def scan(self):
         """Discover the hierarchy of cards and wire pairs."""

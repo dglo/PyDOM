@@ -67,10 +67,10 @@ for o, a in opts:
     elif o == "-d":
         ScalerDeadTime = int(a)
         if int(ScalerDeadTime)>15:
-            print 'Dead-time value must be [0..15]',ScalerDeadTime
+            print 'Dead-time value must be [0..15]', ScalerDeadTime
             sys.exit(1)
         if int(ScalerDeadTime<0):
-            print 'Dead-time value must be [0..15]',ScalerDeadTime
+            print 'Dead-time value must be [0..15]', ScalerDeadTime
             sys.exit(1)
     elif o == "-l":
         RunTime = int(a)
@@ -195,7 +195,7 @@ class Monitor(Thread):
         if (self.Disc == -1):
             self.Disc=r[9]
         self.q.setDAC(9, self.Disc)
-        print  >>sys.stderr,"Debug: Disc set to ", self.Disc
+        print  >>sys.stderr, "Debug: Disc set to ", self.Disc
 
         self.q.setSPEDeadtime(ScalerDeadTime)
         print  >>sys.stderr, "Debug: Dead time set to ", ScalerDeadTime
@@ -214,8 +214,8 @@ class Monitor(Thread):
         elif (self.HighVoltage != -1): 
 		HVSet=self.HighVoltage;
         self.q.enableHV()
-        self.q.setHV(int(2*min(HVSet,r[13])))
-        print  >>sys.stderr,'Debug: HV set to ',int(2*min(HVSet,r[13]))
+        self.q.setHV(int(2*min(HVSet, r[13])))
+        print  >>sys.stderr, 'Debug: HV set to ', int(2*min(HVSet, r[13]))
 
 
 
@@ -234,7 +234,7 @@ class Monitor(Thread):
 	    lines=lines+1
 	    if (self.RunTime>0):
             	if (int(lines) > int(self.RunTime)):
-                	print >>sys.stderr,"Line limit reached. stopping"
+                	print >>sys.stderr, "Line limit reached. stopping"
                 	sys.exit()
 
             if tpc == 0:

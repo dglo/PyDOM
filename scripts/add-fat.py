@@ -2,7 +2,7 @@
 #
 # Add a FAT run to the database
 
-import email,os,sys
+import email, os, sys
 from email.Utils import parsedate
 from icecube.domtest.DOMProdTestDB import DOMProdTestDB, FATData
 
