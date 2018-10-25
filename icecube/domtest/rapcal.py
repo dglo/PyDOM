@@ -69,7 +69,7 @@ class RAPCal:
         self.gpshour = int(self.gpsString[4:6])
         self.gpsmin  = int(self.gpsString[7:9])
         self.gpssec  = int(self.gpsString[10:12])
-        self.gps_offset = 10000000000L*long(
+        self.gps_offset = 10000000000*long(
             60*(60*(24*(self.gpsday-1) + self.gpshour)+ self.gpsmin) + self.gpssec
             ) - self.dorGPSClock
             

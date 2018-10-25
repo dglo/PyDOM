@@ -9,7 +9,7 @@ while True:
     if len(buf) != 300: break
     domid, = struct.unpack("q", buf[0:8])
     print "Read DOM ID %12.12x" % (domid)
-    if domid == 0xA5B57A6DFA0DL:
+    if domid == 0xA5B57A6DFA0D:
         cals.append(rapcal.RAPCal(buf[12:]))
         if len(cals) == 2:
             print 50e-09*(cals[1].dorTx - cals[0].dorTx)
