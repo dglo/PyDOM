@@ -2,6 +2,8 @@
 #
 # DOMProdTestUtil unit tests
 
+from builtins import str
+from builtins import range
 import unittest
 from icecube.domtest.DOMProdTestUtil import getNextId, isDOMSerial, quoteStr
 from icecube.domtest.DOMProdTestDB import DOMProdTestDB

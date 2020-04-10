@@ -1,10 +1,11 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 """
 A DOM configuration module for DAQ
 Author: K. Hanson (kael.hanson@icecube.wisc.edu)
 Date: 2006-01-08
 """
+from __future__ import print_function
 
 import os, sys, math
 import xml.sax, xml.dom.minidom
@@ -60,8 +61,8 @@ def db_connect(host, user):
         
 def log(s, level=0):
     if level > 1:
-        print >>sys.stderr, "[%s] LOG LEVEL=%d: %s" % \
-              (time.strftime("%c"), level, s)
+        print("[%s] LOG LEVEL=%d: %s" % \
+              (time.strftime("%c"), level, s), file=sys.stderr)
     pass
 
 def calculate_hv(gain, par):
@@ -333,8 +334,8 @@ def epilogue(mbids):
     return s + '</runHeader>'
     
 def mkxml(hvpar, filename, hubname, hubid, runtype, rundesc, doms):
-    fxml = file(filename, 'w')
-    print >>fxml, prologue(hubid, runtype, rundesc)
+    fxml = open(filename, 'w')
+    print(prologue(hubid, runtype, rundesc), file=fxml)
     for x in doms:
         string  = int(x[3][0:2])
         module  = int(x[3][3:5])
@@ -344,11 +345,11 @@ def mkxml(hvpar, filename, hubname, hubid, runtype, rundesc, doms):
             ab = 'A'
         # Figure out 1, 2, 3 run type from things like 4,5,6 or 101,102,103
         normalized_runtype = (((runtype-1) % 10) % 3) + 1
-        print >>fxml, generateDOMConfiguration(
+        print(generateDOMConfiguration(
             hvpar, x[0], hubname,
             string, module, x[2],
             ab, normalized_runtype
-            )
-    print >>fxml, epilogue([ x[0] for x in doms ])
+            ), file=fxml)
+    print(epilogue([ x[0] for x in doms ]), file=fxml)
     fxml.close()
     

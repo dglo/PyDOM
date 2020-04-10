@@ -2,12 +2,15 @@
 #
 # 'domprodtest' database class
 
+from __future__ import absolute_import
+from builtins import object
+from future.utils import raise_
 import socket
-import DOMProdTestUtil
+from . import DOMProdTestUtil
 
 ###############################################################################
 
-class BasicDB:
+class BasicDB(object):
     """Basic database object"""
 
     def __init__(self, db):
@@ -50,7 +53,7 @@ class DOMProdTestDB(BasicDB):
         if labId is None:
             labId = self.getLabIdByMachine(self.cursor(), hostname)
             if labId is None:
-                raise IOError, "Laboratory " + hostname + " not found"
+                raise_(IOError, "Laboratory " + hostname + " not found")
 
         return labId
 
@@ -165,7 +168,7 @@ class DOMProdTestDB(BasicDB):
 
         return result
 
-class FATData:
+class FATData(object):
     def __init__(self, name, startDate, endDate, comment, id=None):
         self.id = id
         self.labId = None
@@ -191,8 +194,8 @@ class FATData:
 
     def save(self, db):
         if self.id is not None:
-            raise IOError, "FAT '" + self.name + \
-                "' has already been saved"
+            raise_(IOError, "FAT '" + self.name + \
+                "' has already been saved")
 
         if self.labId is None:
             self.labId = db.getLabId()
@@ -213,7 +216,7 @@ class FATData:
 
         return self.id
 
-class FATRun:
+class FATRun(object):
     """'fat_run' data from 'domprodtest' database"""
 
     def __init__(self, db):

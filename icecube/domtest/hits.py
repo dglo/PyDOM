@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 ####
 ##
@@ -10,8 +10,12 @@
 ##
 ####
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
 import struct
-from cStringIO import StringIO
+from io import StringIO
 from array import array
 
 def calc_atwd_fmt(fmt):
@@ -26,7 +30,7 @@ def calc_atwd_fmt(fmt):
         dtab[fmt[1] & 0x0f],
         dtab[(fmt[1] & 0xf0) >> 4] );
 
-class domhit:
+class domhit(object):
     """
     DOM hit data structure - data members
         domhit.domid

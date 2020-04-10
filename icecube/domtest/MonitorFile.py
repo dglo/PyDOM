@@ -2,13 +2,18 @@
 #
 # Read monitor data and save it to the database
 
+from __future__ import print_function
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
+from future.utils import raise_
 import os, re, sys
-import DOMProdTestUtil
-from DOMProdTestDB import DOMProdTestDB, FATRun
+from . import DOMProdTestUtil
+from .DOMProdTestDB import DOMProdTestDB, FATRun
 
 ##############################################################################
 
-class Monitor:
+class Monitor(object):
     """Monitor file metadata"""
     def __init__(self, temp):
         self.temp = temp
@@ -24,8 +29,8 @@ class Monitor:
         if self.binSize == 0:
             self.binSize = binSize
         elif self.binSize != binSize:
-            raise ValueError, "Expected binSize of " + str(self.binSize) + \
-                ", not " + str(binSize)
+            raise_(ValueError, "Expected binSize of " + str(self.binSize) + \
+                ", not " + str(binSize))
 
     def insert(self, db, fatId):
         if self.binSize == 0:
@@ -56,7 +61,7 @@ class Monitor:
 
         cursor.close()
 
-class MonData:
+class MonData(object):
     """Monitor data"""
 
     def __init__(self, mbId, maxTemp, minTemp, avgTemp, maxHV, minHV, avgHV,
@@ -101,25 +106,25 @@ class MonData:
         cursor = db.cursor()
 
         if False:
-            print 'di int => ' + str(type(dataId))
-            print 'mi int => ' + str(type(monId))
-            print 'pi int => ' + str(type(prodId))
-            print 'xt flt => ' + str(type(self.maxTemp))
-            print 'nt flt => ' + str(type(self.minTemp))
-            print 'at flt => ' + str(type(self.avgTemp))
-            print 'xv int => ' + str(type(self.maxHV))
-            print 'nv int => ' + str(type(self.minHV))
-            print 'av int => ' + str(type(self.avgHV))
-            print 'xp flt => ' + str(type(self.maxPT))
-            print 'np flt => ' + str(type(self.minPT))
-            print 'ap flt => ' + str(type(self.avgPT))
-            print 'xr int => ' + str(type(self.maxRate))
-            print 'nr int => ' + str(type(self.minRate))
-            print 'ar flt => ' + str(type(self.avgRate))
-            print 'wi flt => ' + str(type(self.width))
-            print 'co flt => ' + str(type(self.const))
-            print 'ns int => ' + str(type(self.numSpikes))
-            print 'r2 flt => ' + str(type(self.r2))
+            print('di int => ' + str(type(dataId)))
+            print('mi int => ' + str(type(monId)))
+            print('pi int => ' + str(type(prodId)))
+            print('xt flt => ' + str(type(self.maxTemp)))
+            print('nt flt => ' + str(type(self.minTemp)))
+            print('at flt => ' + str(type(self.avgTemp)))
+            print('xv int => ' + str(type(self.maxHV)))
+            print('nv int => ' + str(type(self.minHV)))
+            print('av int => ' + str(type(self.avgHV)))
+            print('xp flt => ' + str(type(self.maxPT)))
+            print('np flt => ' + str(type(self.minPT)))
+            print('ap flt => ' + str(type(self.avgPT)))
+            print('xr int => ' + str(type(self.maxRate)))
+            print('nr int => ' + str(type(self.minRate)))
+            print('ar flt => ' + str(type(self.avgRate)))
+            print('wi flt => ' + str(type(self.width)))
+            print('co flt => ' + str(type(self.const)))
+            print('ns int => ' + str(type(self.numSpikes)))
+            print('r2 flt => ' + str(type(self.r2)))
 
         cursor.execute(('insert into FATMonData(' +
                         'fat_mondata_id,fat_mon_id,prod_id' +
@@ -153,7 +158,7 @@ class MonData:
 
 ##############################################################################
 
-class MonitorFile:
+class MonitorFile(object):
     def deleteOldRows(self, db, fatId):
         cursor = db.cursor()
 
@@ -192,7 +197,7 @@ class MonitorFile:
             # assume a file descriptor is being passed in
 
             if not temp:
-                raise ValueError, 'Temperature parameter was not specified'
+                raise ValueError('Temperature parameter was not specified')
 
             fd = arg
         else:
@@ -203,8 +208,8 @@ class MonitorFile:
                     temp = p[3:]
 
             if not temp:
-                raise ValueError, "Couldn't find temperature in path '" + \
-                      p + "'"
+                raise_(ValueError, "Couldn't find temperature in path '" + \
+                      p + "'")
 
             fd = open(path, 'r')
 

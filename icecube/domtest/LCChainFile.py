@@ -2,6 +2,9 @@
 #
 # Read lcchain data and save it to the database
 
+from builtins import str
+from builtins import object
+from future.utils import raise_
 import re, sys
 
 STATE_BOGUS = 0
@@ -19,7 +22,7 @@ SENDSTR = ['UNKNOWN', 'D_NEG', 'D_POS', 'U_NEG', 'U_POS']
 
 ##############################################################################
 
-class TestResult:
+class TestResult(object):
     """LCChain test results"""
 
     def __init__(self, highDOM, lowDOM):
@@ -64,21 +67,21 @@ class TestResult:
     def insert(self, db, fatId):
         if self.highDOM is None:
             if self.lowDOM is None:
-                raise ValueError, "Unknown high and low DOMs"
+                raise ValueError("Unknown high and low DOMs")
             else:
-                raise ValueError, "Unknown high DOM"
+                raise ValueError("Unknown high DOM")
         elif self.lowDOM is None:
-            raise ValueError, "Unknown low DOM"
+            raise ValueError("Unknown low DOM")
 
         hiProdId = db.getDOMId(self.highDOM)
         if hiProdId is None:
-            raise ValueError, 'Could not get Product ID for high DOM#' + \
-                self.highDOM
+            raise_(ValueError, 'Could not get Product ID for high DOM#' + \
+                self.highDOM)
 
         loProdId = db.getDOMId(self.lowDOM)
         if loProdId is None:
-            raise ValueError, 'Could not get Product ID for low DOM#' + \
-                self.lowDOM
+            raise_(ValueError, 'Could not get Product ID for low DOM#' + \
+                self.lowDOM)
 
         cursor = db.executeQuery(('insert into FATLCChain(fat_id' +
                                  ',hi_prod_id,lo_prod_id' +
@@ -117,7 +120,7 @@ class TestResult:
 
 ##############################################################################
 
-class LCChainFile:
+class LCChainFile(object):
     def deleteOldRows(self, db, fatId):
         cursor = db.cursor()
 

@@ -2,9 +2,12 @@
 #
 # Tell HubDaemon to get DOMs ready to generate a steering file
 
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
 import os, sys, traceback
 from icecube.domtest.HubDaemon import HubProxy
-from xmlrpclib import Error
+from xmlrpc.client import Error
 
 if len(sys.argv) == 1:
     sys.stderr.write("Please specify one or more domhub machine names\n")
@@ -14,28 +17,28 @@ for s in sys.argv[1:]:
     try:
         driver = HubProxy(s)
 
-        print s, "off all"
+        print(s, "off all")
         driver.offAll()
         domDict = driver.getActiveDoms()
         if len(domDict) > 0:
             sys.stderr.write("Found %d %s DOMS still on:" % (len(domDict), s))
-            for l in domDict.keys():
+            for l in list(domDict.keys()):
                 sys.stderr.write(" " + l)
             sys.stderr.write("\n")
 
-        print s, "on all"
+        print(s, "on all")
         driver.onAll()
         domDict = driver.getActiveDoms()
         sys.stderr.write("Turned %d %s DOMS on:" % (len(domDict), s))
-        for l in domDict.keys():
+        for l in list(domDict.keys()):
             sys.stderr.write(" " + l)
         sys.stderr.write("\n")
 
-        print s, "go to IceBoot"
+        print(s, "go to IceBoot")
         driver.goToIceBoot()
 
-        print s, "dtsx all"
+        print(s, "dtsx all")
         x = driver.dtsxAll()
-        print x
+        print(x)
     except Error:
-        print "For ", s, traceback.print_exc()
+        print("For ", s, traceback.print_exc())

@@ -6,14 +6,19 @@ See the methods' documentation for details about the functionality.
 
 Author: Bernhard Voigt <bernhard.voigt@desy.de>
 """
+from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import warnings
 import time
 from icecube.domtest.domconfiguration import *
 import icecube.domtest.databaseutil as databaseutil
-from xmlrpclib import ServerProxy
+from xmlrpc.client import ServerProxy
 
-class DOM:
+class DOM(object):
     """
     Simple representation of a DOM and the different configuration
     attributes.
@@ -238,7 +243,7 @@ def scanHubs(db, domhubList):
         # the list of DOMs that will be returned
         doms = []
         
-        for mbId, (dorCard, wirePair, wirePosition) in mainboardAndConnection.iteritems():
+        for mbId, (dorCard, wirePair, wirePosition) in mainboardAndConnection.items():
             try:
                 # use the functions provided by the DOMConfigruator class to get the DOM that integrates the mainboard
                 conf = DOMConfigurator(db, mbId)
@@ -249,8 +254,8 @@ def scanHubs(db, domhubList):
                 # to specify the correct DOM-Mainboard relation
                 #prodId = findDOMForOrphanMainboard(mbId)
                 #conf = DOMConfigurator(db, mbId)
-                print """Can't find a DOM that contains the mainboard %s
-                it is supposed to be on dor %i, pair %i and DOM %s""" % (mbId, dorCard, wirePair, wirePosition)
+                print("""Can't find a DOM that contains the mainboard %s
+                it is supposed to be on dor %i, pair %i and DOM %s""" % (mbId, dorCard, wirePair, wirePosition))
 
             prodId = conf.getProductId()
             serialNumber = conf.getSerialNumber()
@@ -586,7 +591,7 @@ def storeConfiguration(db, doms, labName, date=time.strftime('%Y-%m-%d %H:%M'), 
             warnings.warn('The connection for domhub:%s card:%s wire:%s dom:%s does not exist in the \
             FAT_Connection table. You have to add it before this DOM can be configured!' %
                           (dom.domhub, dom.dorCard, dom.wirePair, dom.wirePosition))
-            print connectionId
+            print(connectionId)
 
         sql = """
                FAT_DOM_Configuration
@@ -668,13 +673,13 @@ def printSetupAndConfiguration(db, doms):
     doms list of DOM objects
     """
 
-    print "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" \
-          % ('Serial #', 'Name'.ljust(20), 'domhub'.ljust(15), 'DOR', 'Wire', 'A|B', 'LC Neighbors', 'Max HV', 'Station') 
+    print("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" \
+          % ('Serial #', 'Name'.ljust(20), 'domhub'.ljust(15), 'DOR', 'Wire', 'A|B', 'LC Neighbors', 'Max HV', 'Station')) 
     for dom in doms:
-        print "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" \
+        print("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s" \
               % (dom.serialNumber, dom.name.ljust(20), dom.domhub.ljust(15), dom.dorCard,
                dom.wirePair, dom.wirePosition, lcModeToString(dom.localCoincidenceMode).ljust(10),
-               dom.maxHV, getStationIdentifier(db, dom.stationId))
+               dom.maxHV, getStationIdentifier(db, dom.stationId)))
 
 def lcModeToString(number):
     """
@@ -756,7 +761,7 @@ def insertConnection(db, labName, domhub, dorCard, wirePair,
     # is already defined
     try:
         connectionId = getConnectionId(db, labName, domhub, dorCard, wirePair, wirePosition)
-        print 'oi'
+        print('oi')
         # update the connection and set the breakoutbox and connector values
         sql = """
               UPDATE FAT_Connection SET
@@ -767,7 +772,7 @@ def insertConnection(db, labName, domhub, dorCard, wirePair,
         cursor.execute(sql, (breakoutbox, breakoutboxConnector, connectionId))
         
     except Exception as e:
-        print e
+        print(e)
         # no connection found, insert a new one
 
         # get the lab_id from the database
@@ -837,7 +842,7 @@ def printStationToConnectionMapping(db, labName):
     """
 
     cursor = db.cursor()
-    print "Station\tDOMHub\tDORCard\tWire\tPosition\tBreakoutbox\tConnector"
+    print("Station\tDOMHub\tDORCard\tWire\tPosition\tBreakoutbox\tConnector")
     sql = """
           SELECT domhub, dor, wire, wire_position, breakoutbox, connector FROM FAT_Connection
           INNER JOIN Laboratory l USING (lab_id)
@@ -848,8 +853,8 @@ def printStationToConnectionMapping(db, labName):
         stationId = getStationFromConnection(db, labName, domhub, dor, wire, wirePosition)
         if stationId != None:
             stationIdentifier = getStationIdentifier(db, stationId)
-            print ("%s\t%s\t%s\t%s\t%s\t%s\t%s") % \
-                  (stationIdentifier, domhub, dor, wire, wirePosition, breakoutbox, connector)
+            print(("%s\t%s\t%s\t%s\t%s\t%s\t%s") % \
+                  (stationIdentifier, domhub, dor, wire, wirePosition, breakoutbox, connector))
 
 # end printStatoinToConnectionMapping
         

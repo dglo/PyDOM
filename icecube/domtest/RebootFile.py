@@ -2,13 +2,20 @@
 #
 # Read cold-reboot data and save it to the database
 
+from __future__ import print_function
+from __future__ import absolute_import
+from past.builtins import cmp
+from builtins import str
+from builtins import range
+from builtins import object
+from future.utils import raise_
 import re, sys, time
-import DOMProdTestUtil
+from . import DOMProdTestUtil
 import _mysql_exceptions
 
 ##############################################################################
 
-class RebootBase:
+class RebootBase(object):
     """Basic reboot data"""
 
     def __init__(self, time):
@@ -61,7 +68,7 @@ class RebootSuccess(RebootBase):
 
 ##############################################################################
 
-class DOM:
+class DOM(object):
     """DOM info"""
 
     def __init__(self, name, mbId):
@@ -151,8 +158,8 @@ class DOM:
     def insert(self, db, nextId, fatId):
         prodId = self.getProdId(db)
         if prodId is None:
-            raise ValueError, 'Could not get Product ID for DOM#' + \
-                self.mbId + '(' + self.name + ')'
+            raise_(ValueError, 'Could not get Product ID for DOM#' + \
+                self.mbId + '(' + self.name + ')')
 
         cursor = db.executeQuery('select fat_reboot_id,num_success' +
                                  ',num_failed from FATReboot' +
@@ -203,7 +210,7 @@ class DOM:
 
 ##############################################################################
 
-class RebootFile:
+class RebootFile(object):
     def deleteOldRows(self, db, fatId):
         cursor = db.cursor()
 
@@ -227,7 +234,7 @@ class RebootFile:
 
         nextId = DOMProdTestUtil.getNextId(db, 'FATReboot', 'fat_reboot_id')
 
-        for k in dorMap.keys():
+        for k in list(dorMap.keys()):
             try:
                 id = dorMap[k].insert(db, nextId, fatId)
             except ValueError:
@@ -259,7 +266,7 @@ class RebootFile:
         for line in fd:
             m = rebootPat.match(line)
             if not m:
-                print 'Mismatch: ' + line
+                print('Mismatch: ' + line)
                 continue
 
             domhub = m.group(1)
@@ -297,7 +304,7 @@ class RebootFile:
 
             if data.endswith('FAILURE'):
                 if key not in dorMap:
-                    print 'Failure for unknown DOR entry ' + key
+                    print('Failure for unknown DOR entry ' + key)
                     continue
 
                 dorMap[key].addFailure(timeList, data)
@@ -305,7 +312,7 @@ class RebootFile:
             else:
                 m = dataPat.match(data)
                 if not m:
-                    print 'Data mismatch: ' + line
+                    print('Data mismatch: ' + line)
                     continue
 
                 utime = m.group(1)
@@ -331,7 +338,7 @@ class RebootFile:
         if len(dorMap) == 0:
             return None
 
-        for k in dorMap.keys():
+        for k in list(dorMap.keys()):
             dorMap[k].fillFailures()
 
         return dorMap

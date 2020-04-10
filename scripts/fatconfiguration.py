@@ -6,7 +6,11 @@ script, which you can get by calling it with the -h option
 
 Author: Bernhard Voigt <bernhard.voigt@desy.de>
 """
+from __future__ import print_function
 
+from builtins import zip
+from builtins import str
+from builtins import range
 import sys
 import warnings
 import readline # improved command line editing, raw_input method is overwritten
@@ -34,8 +38,7 @@ FAT_SETUP_DIALOG = 2
 ######################################
 
 def usage():
-    print >>sys.stderr, \
-          """
+    print("""
           Usage:
           fatconfiguration.py -H db-server -u db-user -p db-user-passwd -s site-name
                               [-t] [-v] [-f] [--no-configuration] [--add-to-fat=fat-name]
@@ -135,7 +138,7 @@ def usage():
 
           See also:
           dfl_station_connection_setup.py to define the DFL station connection mapping
-          """
+          """, file=sys.stderr)
 
 # end def usage
 
@@ -175,7 +178,7 @@ def getNamesFromFile(filename):
     try:
         file = open(filename, 'r')
     except IOError as error:
-        print "Could not open %s for reading the DOM names" % filename
+        print("Could not open %s for reading the DOM names" % filename)
         return
 
     for line in file:
@@ -205,9 +208,9 @@ def configurationDialog(doms, DIALOG_SELECT):
             fields = {}
             # print the current configuration
             if dom.name is None:
-                print "- # %i of %i ------- %s ---------" % (currentDOM, totalNumberOfDOMs, dom.serialNumber)
+                print("- # %i of %i ------- %s ---------" % (currentDOM, totalNumberOfDOMs, dom.serialNumber))
             else:
-                print "- # %i of %i --- %s - %s --------" % (currentDOM, totalNumberOfDOMs, dom.serialNumber, dom.name)
+                print("- # %i of %i --- %s - %s --------" % (currentDOM, totalNumberOfDOMs, dom.serialNumber, dom.name))
 
             # test the given bitmask for the selection of the configuration dialog
             if DIALOG_SELECT & CONFIGURATION_DIALOG:
@@ -264,40 +267,40 @@ def printConfiguration(dom, fields):
     if setNames:
         # starting at position 1
         fieldCounter += 1
-        print "%i DOM Name: %s " % (fieldCounter, dom.name)
+        print("%i DOM Name: %s " % (fieldCounter, dom.name))
         fields[fieldCounter]='DOM Name'
 
         fieldCounter += 1
-        print "%i Name Explanation: %s " % (fieldCounter, dom.nameExplanation)
+        print("%i Name Explanation: %s " % (fieldCounter, dom.nameExplanation))
         fields[fieldCounter]='Name Explanation'
 
         fieldCounter += 1
-        print "%i Name Theme: %s " % (fieldCounter, dom.nameTheme)
+        print("%i Name Theme: %s " % (fieldCounter, dom.nameTheme))
         fields[fieldCounter]='Name Theme'
 
     fieldCounter += 1
-    print "%i DOMHub: %s " % (fieldCounter, dom.domhub)
+    print("%i DOMHub: %s " % (fieldCounter, dom.domhub))
     fields[fieldCounter] = 'DOMHub Name'
 
     fieldCounter += 1
-    print "%i DORCard: %s " % (fieldCounter, dom.dorCard)
+    print("%i DORCard: %s " % (fieldCounter, dom.dorCard))
     fields[fieldCounter] = 'DOR-Card #'
 
     fieldCounter += 1
-    print "%i Wire: %s " % ( fieldCounter, dom.wirePair)
+    print("%i Wire: %s " % ( fieldCounter, dom.wirePair))
     fields[fieldCounter] = 'Wire Pair #'
 
     fieldCounter += 1
-    print "%i Position[A|B]: %s " % (fieldCounter, dom.wirePosition)
+    print("%i Position[A|B]: %s " % (fieldCounter, dom.wirePosition))
     fields[fieldCounter] = 'Position [A|B]'
 
     fieldCounter += 1
-    print "%i Local Coincidence Mode [0 = no neighbor|1 = both|2 = no bottom|3 = no top]': %s " % \
-          (fieldCounter, dom.localCoincidenceMode)
+    print("%i Local Coincidence Mode [0 = no neighbor|1 = both|2 = no bottom|3 = no top]': %s " % \
+          (fieldCounter, dom.localCoincidenceMode))
     fields[fieldCounter] = 'Local Coincidence Mode [0 = no neighbor|1 = both|2 = no bottom|3 = no top]'
 
     fieldCounter += 1
-    print "%i Maximum allowed HV: %s " % (fieldCounter, dom.maxHV)
+    print("%i Maximum allowed HV: %s " % (fieldCounter, dom.maxHV))
     fields[fieldCounter] = 'Maximum HV'
 
     return fields
@@ -319,7 +322,7 @@ def printFatSetup(dom, fields):
 
     fieldCounter = len(fields)
     fieldCounter += 1 # starting at position 1
-    print "%i Station: %s " % (fieldCounter, fatsetup.getStationIdentifier(db, dom.stationId))
+    print("%i Station: %s " % (fieldCounter, fatsetup.getStationIdentifier(db, dom.stationId)))
     fields[fieldCounter] = 'Station Identifier'
     return fields
 # end printFatSetup
@@ -406,7 +409,7 @@ try:
                                  'no-configuration', 'no-scan', 'rename'])
 
 except GetoptError as e:
-    print e
+    print(e)
     usage()
     sys.exit(1)
 
@@ -446,25 +449,25 @@ for option, value in options:
         doScanning = False
 
 # print an empty line to separate the output from the command line
-print
+print()
 
 # check whether the manadatory options are set
 mandatoryOptions = True
 if labName is None:
-    print >>sys.stderr, "Command line option -s SiteName has to be specified"
+    print("Command line option -s SiteName has to be specified", file=sys.stderr)
     mandatoryOptions = False
 if dbHost is None:
-    print >>sys.stderr, "Command line option -H DatabaseHost has to be specified"
+    print("Command line option -H DatabaseHost has to be specified", file=sys.stderr)
     mandatoryOptions = False
 if dbUser is None:
-    print >>sys.stderr, "Command line option -u DatabaseUser has to be specified"
+    print("Command line option -u DatabaseUser has to be specified", file=sys.stderr)
     mandatoryOptions = False
 if dbUserPasswd is None:
-    print >>sys.stderr, "Command line option -p DatabasePassword has to be specified"
+    print("Command line option -p DatabasePassword has to be specified", file=sys.stderr)
     mandatoryOptions = False
 
 if not mandatoryOptions:
-    print
+    print()
     sys.exit(1)
 
 
@@ -481,8 +484,8 @@ else:
     try:
         availableDoms = fatsetup.scanHubs(db, arguments)
     except Exception as e:
-        print >>sys.stderr, "Could not connect to one of the given domhubs: %s" % arguments
-        print >>sys.stderr, e
+        print("Could not connect to one of the given domhubs: %s" % arguments, file=sys.stderr)
+        print(e, file=sys.stderr)
         sys.exit(1)
 
 # the list of DOMs that should be configured is the intersection of the only-doms list and the
@@ -503,7 +506,7 @@ if setNames and domNames is not None:
     try:
         setName(doms, domNames)
     except Exception as e:
-        print e
+        print(e)
         userInput = prompt("Continue (c) Abort(q): ")
         if userInput == 'c':
             pass
@@ -552,4 +555,4 @@ if setNames and not noSave:
 
 if printSetupAndConfiguration:
     fatsetup.printSetupAndConfiguration(db, doms)
-    print
+    print()

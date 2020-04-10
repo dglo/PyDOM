@@ -5,6 +5,10 @@ IceCube DFL Testing Light Sources Pythonic Control Interface Module
 
 """
 
+from builtins import map
+from builtins import range
+from builtins import object
+from future.utils import raise_
 import socket
 import time
 import math
@@ -29,7 +33,7 @@ class LockInSyncFailure(Exception):
         return "LockIn failed to sync after %d iterations." % (self.iter)
     
         
-class pulser:
+class pulser(object):
     """Pythonic interface to Chris W's uC pulser circuit.
     The pulser delivers up to 3 optical signals:
         - Marker pulse   a 26 dB pulse that is used to
@@ -73,7 +77,7 @@ class pulser:
         time.sleep(0.1)
         ans = self.s.recv(100).strip()
         # Error handling
-        if ans.find('?') >= 0: raise PulserException, ans
+        if ans.find('?') >= 0:raise_(PulserException, ans)
             
     def setPulseFrequency(self, f):
         """Set the frequency in Hz."""
@@ -135,7 +139,7 @@ def sync(clx, clk0, err, tol=1E-08, bin_width=1.0):
     brk = [clk0 - err, clk0, clk0 + err]
     hist = perhist(clx, bin_width)
     for i in range(500):
-        vals = map(hist.fill, brk)
+        vals = list(map(hist.fill, brk))
 
         # Harbinger of bad things to come
         if brk[2]==brk[1] or brk[1]==brk[0]:
@@ -162,9 +166,9 @@ def sync(clx, clk0, err, tol=1E-08, bin_width=1.0):
             return (hist.mode(), brk[1])
 
     # Fail
-    raise LockInSyncFailure, i
+    raise_(LockInSyncFailure, i)
 
-class perhist:
+class perhist(object):
     def __init__(self, clk, w):
         self.clk = clk
         self.bin_width = w
@@ -190,7 +194,7 @@ class perhist:
 
     def mode(self):
         self.max = max(self.hist.values())
-        for bin in self.hist.keys():
+        for bin in list(self.hist.keys()):
             if self.hist[bin] == self.max:
                 return bin*self.bin_width
 
@@ -218,7 +222,7 @@ MICRONS    = 0
 NANOMETERS = 1
 ANGSTROMS  = 2
 
-class Digikrom:
+class Digikrom(object):
     
     def __init__(self, host, port):
         """Open a connection to the monochromator over TCP sockets."""
@@ -289,7 +293,7 @@ import socket
 import struct
 
 
-class FilterWheel:
+class FilterWheel(object):
     
     def __init__(self, host, port):
         """Open a connection to the filter wheel over TCP sockets."""

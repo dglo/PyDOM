@@ -1,18 +1,24 @@
 """
 RAPCal data structures and functions
 """
+from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
+from future.utils import raise_
 from struct import unpack
 import time
 from calendar import timegm
-from cStringIO import StringIO
+from io import StringIO
 from numpy import array, sum
 from icecube.domtest.util import softdisc
 
 """The RAPCal Discriminator threshold."""
 DISC_THRESHOLD = 50.0
 
-class RAPCal:
+class RAPCal(object):
     """
     Data class for TCAL record - fields are ...
         - dorTx         time of pulse transmitted DOR -> DOR
@@ -69,7 +75,7 @@ class RAPCal:
         self.gpshour = int(self.gpsString[4:6])
         self.gpsmin  = int(self.gpsString[7:9])
         self.gpssec  = int(self.gpsString[10:12])
-        self.gps_offset = 10000000000*long(
+        self.gps_offset = 10000000000*int(
             60*(60*(24*(self.gpsday-1) + self.gpshour)+ self.gpsmin) + self.gpssec
             ) - self.dorGPSClock
             
@@ -98,7 +104,7 @@ class RAPCal:
             #a = array('d', self.dorWaveform[0:48])
             baseline = sum(a[0:10])/10.0
             e = softdisc(a, baseline + DISC_THRESHOLD)
-            self.dorrxc = 500*self.dorRx + long(500.0*(e[0].x - 48))
+            self.dorrxc = 500*self.dorRx + int(500.0*(e[0].x - 48))
         return self.dorrxc
     
     def getDomRxC(self):
@@ -108,7 +114,7 @@ class RAPCal:
             #a = array('d', self.dorWaveform[0:48])
             baseline = sum(a[0:10])/10.0
             e = softdisc(a, baseline + DISC_THRESHOLD)
-            self.domrxc = 250*self.domRx + long(500.0*(e[0].x - 48))
+            self.domrxc = 250*self.domRx + int(500.0*(e[0].x - 48))
         return self.domrxc
 
     def doRAPCal(self, r0):
@@ -117,18 +123,18 @@ class RAPCal:
             self.clkratio = float(self.getDorTx() - r0.getDorTx()) / \
                             float(self.getDomRxC() - r0.getDomRxC())
             self.cablelen = (self.getDorRxC() - self.getDorTx() - \
-                             long(self.clkratio*(self.getDomTx() - \
+                             int(self.clkratio*(self.getDomTx() - \
                              self.getDomRxC()))) / 2
 
     def dom2Dor(self, domclk):
-        return long(self.clkratio * (250*domclk - self.getDomRxC())) + \
+        return int(self.clkratio * (250*domclk - self.getDomRxC())) + \
             self.getDorTx() + self.cablelen
             
     def dom2UT(self, domclk):
         dor = self.dom2Dor(domclk)
         return dor + self.gps_offset
     
-class TimeCalibrator:
+class TimeCalibrator(object):
     """
     The IceCube TimeCalibrator class.  Given a .tcal
     stream from TestDAQ, this class reads in the
@@ -162,7 +168,7 @@ class TimeCalibrator:
         elif fmtver == 1:
             recl = 334
         else:
-            raise ValueError, "Unknown TCAL format version %d" % fmtver
+            raise_(ValueError, "Unknown TCAL format version %d" % fmtver)
         while True:
             buf = f.read(recl)
             if len(buf) != recl: break
@@ -268,7 +274,7 @@ def tcal(cpd):
     buf = os.read(ft, 292)
     os.close(ft)
     if len(buf) != 292:
-        print >>sys.stderr, "ERROR: short TCAL read (%d bytes)" % len(buf)
+        print("ERROR: short TCAL read (%d bytes)" % len(buf), file=sys.stderr)
         return
     return RAPCal(buf[4:])
     

@@ -2,6 +2,8 @@
 Python module to parse DAQ MBean logfiles
 """
 
+from builtins import object
+from future.utils import raise_
 import re
 from datetime import datetime, timedelta
 
@@ -21,12 +23,12 @@ v0 = re.compile("[0-9]+$")
 v1 = re.compile("\[\s*(.+)\s*\]")
 v2 = re.compile("\'(.+)\'")
 
-class BeanInfo:
+class BeanInfo(object):
     def __init__(self, name, time):
         self.name = name
         self.time = time
         
-class BeanParser:
+class BeanParser(object):
 
     
     def __init__(self, f):
@@ -64,16 +66,16 @@ class BeanParser:
                     self.activeBean = None
                 return
             m = h2.match(self.s)
-            if m is None: raise BeanParserException, self.s
+            if m is None:raise_(BeanParserException, self.s)
             attrName = m.group(1)
             valText  = m.group(2)
-            if v0.match(valText): self.activeBean.__dict__[attrName] = long(valText)
+            if v0.match(valText): self.activeBean.__dict__[attrName] = int(valText)
 	    lm = v1.match(valText)
 	    if lm is not None:
 		vlist = [ ]
 		for x in lm.group(1).split(", "):
 		    if v0.match(x): 
-			vlist.append(long(x))
+			vlist.append(int(x))
                     elif v2.match(x):
                         vlist.append(x[1:-1])
 		    else:

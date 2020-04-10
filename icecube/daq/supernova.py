@@ -3,9 +3,13 @@
 A module to handle IceCube supernova data
 """
 
+from builtins import zip
+from builtins import range
+from builtins import object
+from future.utils import raise_
 from struct import unpack, pack
 
-class SNData:
+class SNData(object):
     
     def __init__(self, data, mbid, utc):
         """
@@ -19,7 +23,7 @@ class SNData:
             << 8 | t2) << 8 | t1) << 8 | t0
         self.utcend  = self.utc + len(self.scalers) * 16384000
         
-class SNPayloadReader:
+class SNPayloadReader(object):
     def __init__(self, f):
         self.f = f
         
@@ -54,7 +58,7 @@ def procsn(f, holdoff=10000):
         mbid = "%12.12x" % mbid
         s = SNData(hdr + buf)
         mtim[mbid] = s.utcend
-        if ta is None: ta = s.utc / 10000000000 * 10000000000
+        if ta is None: ta = s.utc // 10000000000 * 10000000000
         rebin(a, ta, da, s.scalers, s.utc, db)
         hold += 1
     
@@ -71,10 +75,10 @@ def rebin(a, ta, da, b, tb, db):
         - db        bin width for array b elements
     """
     
-    ia = (tb - ta) / da
+    ia = (tb - ta) // da
     
     # Compute storage requirements for a
-    na = (tb + len(b) * db - ta) / da + 1
+    na = (tb + len(b) * db - ta) // da + 1
     if na > len(a):
         a += ([0] * (na - len(a)))
         
@@ -106,7 +110,7 @@ def gaps(snvec):
         if (y.domclk - x.domclk) >> 16 != len(x.scalers): g.append(i-1)
     return g
    
-class S2Codec:
+class S2Codec(object):
     """
     A simple encoder/decoder which translates SN vectors into
     a bit-packed representation of symbols where
@@ -143,7 +147,7 @@ class S2Codec:
                 self.__pushn(15)
                 self.__pushn(s)
             else:
-                raise ValueError, s
+                raise_(ValueError, s)
                 
         # Push the STOP
         self.__pushn(15)
@@ -211,7 +215,7 @@ class S2Codec:
         self.bpos += 4
         return nybble
 
-class ScalerComposition:
+class ScalerComposition(object):
     """
     The ScalerComposition class allows one to 'merge' arrays of
     unsynchronized scalers to produce a global scaler.  The scalers
@@ -247,4 +251,4 @@ class ScalerComposition:
             [ ( s0, c0 ), ( s1, c1 ), ... ]
         of rebinned counts and the occupancy of the bins.
         """
-        return zip(self.ar, self.ct)
+        return list(zip(self.ar, self.ct))

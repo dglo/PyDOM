@@ -1,5 +1,7 @@
-#!/bin/env python
+#!/usr/bin/env python
 
+from __future__ import print_function
+from builtins import range
 import sys, time, math
 from icecube.domtest import pulser, ibidaq as daq
 from getopt import getopt
@@ -97,12 +99,12 @@ time.sleep(5.0)
 s = 10.0 / integration
 for i in range(n):
     (bkg, sig) = rate(q, p, integration)
-    if verbose > 2: print bkg, sig
+    if verbose > 2: print(bkg, sig)
     xs = sig - bkg
     xs_err = math.sqrt(bkg + sig)
     xs *= s
     xs_err *= s
-    print "%.3f +/- %.3f" % (xs / pulse_freq, xs_err / pulse_freq)
+    print("%.3f +/- %.3f" % (xs / pulse_freq, xs_err / pulse_freq))
 
 p.allOff()
 q.setHV(0)

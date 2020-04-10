@@ -2,6 +2,9 @@
 #
 # Add a FAT run to the database
 
+from __future__ import print_function
+from builtins import str
+from builtins import range
 import email, os, sys
 from email.Utils import parsedate
 from icecube.domtest.DOMProdTestDB import DOMProdTestDB, FATData
@@ -112,6 +115,6 @@ fatData = FATData(fatName, startDate, endDate, comment)
 
 fatData.save(db)
 
-print "Saved " + fatData.name + " as ID#" + str(fatData.id)
+print("Saved " + fatData.name + " as ID#" + str(fatData.id))
 
 db.close()

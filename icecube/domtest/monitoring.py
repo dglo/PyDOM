@@ -1,5 +1,8 @@
-#!/bin/env python
+#!/usr/bin/env python
 
+from __future__ import print_function
+from builtins import range
+from builtins import object
 import sys
 from struct import unpack
 
@@ -17,7 +20,7 @@ def MonitorRecordFactory(buf, domid='????????????', timestamp=0):
     else:
         return MonitorRecord(domid, timestamp, buf, moniLen, moniType, domClock)
     
-class MonitorRecord:
+class MonitorRecord(object):
     """
     Generic monitor record type - supports the common base information
     contained in all monitor records.
@@ -51,7 +54,7 @@ class ConfigMonitorRecord(MonitorRecord):
         MonitorRecord.__init__(self, domid, timestamp, buf, moniLen, moniType, domClock)
 
     def __str__(self):
-        print len(self.buf)
+        print(len(self.buf))
         return """
     DOM Id .............................. %s
     UT Timestamp ........................ %x

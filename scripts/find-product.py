@@ -2,6 +2,9 @@
 #
 # Look up a DOM/main board by various identifiers
 
+from __future__ import print_function
+from builtins import str
+from builtins import range
 import MySQLdb
 import re, sys
 import icecube.domtest.DOMProdTestUtil as DOMProdTestUtil
@@ -21,7 +24,7 @@ def dumpAssembly(row, spaces, showIds):
     else:
         idStr = ' (assem#' + str(assemId) + ')'
 
-    print '  Created ' + str(dateTime) + idStr
+    print('  Created ' + str(dateTime) + idStr)
 
 def dumpDOM(db, hardSerial, tagSerial, showIds):
     """Dump DOM data"""
@@ -32,18 +35,18 @@ def dumpDOM(db, hardSerial, tagSerial, showIds):
 
         name = fetchDOMNameByProdId(db, prodId)
         if name is not None:
-            print '  Name ' + name
+            print('  Name ' + name)
 
         assemList = fetchAssemByProdId(db, prodId)
         if len(assemList) == 0:
-            print '  No Assembly rows' 
+            print('  No Assembly rows') 
         else:
             for row in assemList:
                 (assemId, aProdId, techId, datetime) = row
                 dumpAssembly(row, '  ', showIds)
                 apList = fetchAssemProdByAssemId(db, assemId)
                 if len(apList) == 0:
-                    print '    No AssemblyProduct rows'
+                    print('    No AssemblyProduct rows')
                 else:
                     for subProdId in apList:
                         subList = fetchProdByProdId(db, subProdId)
@@ -52,7 +55,7 @@ def dumpDOM(db, hardSerial, tagSerial, showIds):
                                 idStr = ''
                             else:
                                 idStr = ' for Prod#' + str(subProdId)
-                            print 'No Product data' + idStr
+                            print('No Product data' + idStr)
                         else:
                             for row in subList:
                                 dumpProduct(row, '    ', showIds)
@@ -66,7 +69,7 @@ def dumpMB(db, hardSerial, tagSerial, showIds):
 
         apList = fetchAssemProdByProdId(db, prodId)
         if len(apList) == 0:
-            print '  No AssemblyProduct rows'
+            print('  No AssemblyProduct rows')
         else:
             for assemId in apList:
                 list = fetchAssemByAssemId(db, assemId)
@@ -75,7 +78,7 @@ def dumpMB(db, hardSerial, tagSerial, showIds):
                         idStr = ''
                     else:
                         idStr = ' for Assem#' + str(assemId)
-                    print '  No Assembly rows'
+                    print('  No Assembly rows')
                 else:
                     for row in list:
                         (xAssemId, xProdId, xTechId, xDateTime) = row
@@ -87,7 +90,7 @@ def dumpMB(db, hardSerial, tagSerial, showIds):
                             (domProdId, domHard, domTag, domType) = row
                             name = fetchDOMNameByProdId(db, domProdId)
                             if name is not None:
-                                print '    Name ' + name
+                                print('    Name ' + name)
 
 def dumpProduct(row, spaces, showIds):
     """Dump Product row"""
@@ -107,7 +110,7 @@ def dumpProduct(row, spaces, showIds):
         idStr = ''
     else:
         idStr = ' (prod#' + str(prodId) + ')'
-    print spaces + str(typeName) + hardStr + tagStr + idStr
+    print(spaces + str(typeName) + hardStr + tagStr + idStr)
 
 def fetchAssemByAssemId(db, assemId):
     """Fetch a row from the Assembly table using an 'assem_id' key"""
@@ -301,6 +304,6 @@ for a in range(1, len(sys.argv)):
         if domTag:
             dumpDOM(db, None, domTag, showIds)
         else:
-            print 'Unknown string "' + arg + '"'
+            print('Unknown string "' + arg + '"')
 
 db.close()

@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 """
 Local Coincidence test module
@@ -24,7 +24,11 @@ or
 etc.
 
 """
+from __future__ import print_function
 
+from past.builtins import cmp
+from builtins import range
+from builtins import object
 import sys, os, time, math
 from struct import *
 from icecube.daq import domapp
@@ -38,12 +42,12 @@ dom_up = None
 dom_dn = None
 
 def int_handler(signum, frame):
-    print >>sys.stderr, "terminating run ..."
+    print("terminating run ...", file=sys.stderr)
     dom_up.app.endRun()
     dom_dn.app.endRun()
     sys.exit(1)
     
-class dom_harness:
+class dom_harness(object):
     
     def __init__(self, cwd):
         self.card = int(cwd[0])
@@ -113,7 +117,7 @@ class dom_harness:
         buf = os.read(ft, 292)
         os.close(ft)
         if len(buf) != 292:
-            print >>sys.stderr, "ERROR: short TCAL read (%d bytes)" % len(buf)
+            print("ERROR: short TCAL read (%d bytes)" % len(buf), file=sys.stderr)
             return
         rc = RAPCal(buf[4:])
         rc.setGPSString(self.gpsbuf)
@@ -178,8 +182,8 @@ def collect(dom_up, dom_dn, n=100):
 
     if len(hup) > 5 and len(hdn) > 2:
     
-        print "up rate:", calc_rate(hup)
-        print "dn rate:", calc_rate(hdn)
+        print("up rate:", calc_rate(hup))
+        print("dn rate:", calc_rate(hdn))
         hits = hup + hdn
         hits.sort(lambda x, y: cmp(x.utclk, y.utclk))
         
@@ -199,9 +203,9 @@ def collect(dom_up, dom_dn, n=100):
             nlc += 1
             dtlist.append(dt)
         
-        print >>sys.stderr, nlc, len(hits), \
+        print(nlc, len(hits), \
               "frac = %.1f%%" % (100.0*float(nlc)/n), \
-              "mean = %.1f, std = %.1f" % meanstd(dtlist)
+              "mean = %.1f, std = %.1f" % meanstd(dtlist), file=sys.stderr)
 
     dom_up.app.endRun()
     dom_dn.app.endRun()
@@ -260,14 +264,14 @@ if __name__ == "__main__":
             p.setPulseFrequency(100)
             p.fastOn()
         except ValueError:
-            print >>sys.stderr, "WARNING: pulser addr parameter not " +\
-                "host:port format - ignoring pulser"
+            print("WARNING: pulser addr parameter not " +\
+                "host:port format - ignoring pulser", file=sys.stderr)
             
 
     signal.signal(signal.SIGINT, int_handler)
     
     for delay in range(del0, del1, ddel):
-        print >>sys.stderr, "Setting delay parameter to", delay
+        print("Setting delay parameter to", delay, file=sys.stderr)
         dom_up.app.setLC(mode=up_rx,
                          transmit=up_tx,
                          type=2,

@@ -12,15 +12,17 @@ You should define an environmental variable NICKNAMES which points
 to a file with MBID\s+DOMID\s+NICKNAME\s+LOCATION lines.
 """
 
+from builtins import range
+from builtins import object
 import os, re
 
-class Nicknames:
+class Nicknames(object):
     def __init__(self, filename):
         pattern = re.compile('([0-9a-f]{12})\s+(\w{8})\s+(\w+)\s+([0-9A-Z]{2}\-[0-9]{2}).*')
         self.mpat = re.compile('[0-9a-f]{12}')
         self.dpat = re.compile('([ATUX][EP][0-9][HPY][0-9]{4})')
         self.lpat = re.compile('\w{2}\-[0-9]{2}')
-        f = file(filename)
+        f = open(filename)
         self.by_mbid  = dict()
         self.by_domid = dict()
         self.by_name  = dict()

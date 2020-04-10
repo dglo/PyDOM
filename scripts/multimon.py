@@ -9,12 +9,16 @@ Changes 15/11/05: HL
 - New parameters - number of lines, HV, disc, dead time
 - Check HVMax from table domtune in FAT database
 """
+from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
 import sys, time, os
 import re
 from icecube.domtest.ibidaq import ibx
 from icecube.domtest.dor import Driver
-from xmlrpclib import ServerProxy
+from xmlrpc.client import ServerProxy
 from threading import Thread
 from getopt import getopt
 import signal
@@ -22,9 +26,8 @@ import MySQLdb
 from threading import Lock
 
 def usage():
-    print >>sys.stderr, \
-          """usage::multimon.py [ -H <db-server> ] [ -S <site> ] [ -o <output-dir> ] [-d <scaler-Dead time>0..11]  [-c <discriminator setting> 0..1023] [-l 
-<Number_of_output_lines>] [-V <High voltage>] [-g <gain in E7 units>5,1,0.5,0.05][ domhub ... ]"""
+    print("""usage::multimon.py [ -H <db-server> ] [ -S <site> ] [ -o <output-dir> ] [-d <scaler-Dead time>0..11]  [-c <discriminator setting> 0..1023] [-l 
+<Number_of_output_lines>] [-V <High voltage>] [-g <gain in E7 units>5,1,0.5,0.05][ domhub ... ]""", file=sys.stderr)
 
 monitorDir = os.path.expanduser("~/monitoring")
 dbhost     = "localhost"
@@ -62,38 +65,38 @@ for o, a in opts:
         elif (Gain == 0.05):
 		Gain = 3 # gain 5e5, us hv3
         else:
-            print 'Illegal Gain value, setting can be 5,1,0.5,0.05'
+            print('Illegal Gain value, setting can be 5,1,0.5,0.05')
             sys.exit(1)
     elif o == "-d":
         ScalerDeadTime = int(a)
         if int(ScalerDeadTime)>15:
-            print 'Dead-time value must be [0..15]', ScalerDeadTime
+            print('Dead-time value must be [0..15]', ScalerDeadTime)
             sys.exit(1)
         if int(ScalerDeadTime<0):
-            print 'Dead-time value must be [0..15]', ScalerDeadTime
+            print('Dead-time value must be [0..15]', ScalerDeadTime)
             sys.exit(1)
     elif o == "-l":
         RunTime = int(a)
     elif o == "-c":
         Disc = int(a)
         if Disc>1023:
-            print 'Discriminator values must be [0..1023]'
+            print('Discriminator values must be [0..1023]')
             sys.exit(1)
         if Disc<0:
-            print 'Discriminator values must be [0..1023]'
+            print('Discriminator values must be [0..1023]')
             sys.exit(1)
     elif o == "-V":
         if (Gain == -1):
             HighVoltage = int(a)
         else:
-            print 'Gain already set, cannot set High voltage as well'
+            print('Gain already set, cannot set High voltage as well')
             sys.exit(1)
     elif o == "-h":
         usage()
         sys.exit(1)
 
 def stopper(signum, frame):
-    print "Caught signal - stopping threads."
+    print("Caught signal - stopping threads.")
     for t in threads:
         t.running = 0
     for t in threads:
@@ -117,17 +120,17 @@ class Monitor(Thread):
             self.q = ibx(self.host, self.port)
             domid = self.q.getId()
             if re.compile("[0-9A-Fa-f]").match(domid): break
-            print >> sys.stderr, "***WARNING - DOM at %s:%d got bad ID" \
-                  % (self.host, self.port)
+            print("***WARNING - DOM at %s:%d got bad ID" \
+                  % (self.host, self.port), file=sys.stderr)
             del(self.q)
             init_counter += 1
 
         if init_counter == 4:
-            print >> sys.stderr, "***ERROR - DOM at %s:%d failed to init" \
-                  % (self.host, self.port)
+            print("***ERROR - DOM at %s:%d failed to init" \
+                  % (self.host, self.port), file=sys.stderr)
             return
         
-#        self.f = file(monitorDir + "/" + domid + ".moni", "a")
+#        self.f = open(monitorDir + "/" + domid + ".moni", "a")
         
         # Get info from the DB - make sure to surround in locking
         # objects to synchronize access to the db connection
@@ -152,9 +155,8 @@ class Monitor(Thread):
         
         if r == None:
             r = [ 0 ] * 17
-            print >>sys.stderr, \
-                  "WARNING: DOM %s not in database - " \
-                  "set to default values" % (domid)
+            print("WARNING: DOM %s not in database - " \
+                  "set to default values" % (domid), file=sys.stderr)
             r[0]  = 850     #  atwd0_trigger_bias
             r[1]  = 850     # atwd1_trigger_bias
             r[2]  = 350    # atwd0_ramp_rate
@@ -171,14 +173,14 @@ class Monitor(Thread):
             r[14] = 1300    # hv0
             r[15] = 1300    #hv2
             r[16] = 1300    #hv3
-            self.f = file(monitorDir + "/" + domid + ".moni", "a")
+            self.f = open(monitorDir + "/" + domid + ".moni", "a")
             
         else:
-            print >>sys.stderr, "Found DOM %s (%s)" % (r[11], domid)
+            print("Found DOM %s (%s)" % (r[11], domid), file=sys.stderr)
             if (Site == "DESY"):
-                self.f = file(monitorDir + "/" + domid + ".moni", "a")  
+                self.f = open(monitorDir + "/" + domid + ".moni", "a")  
             else:
-                self.f = file(monitorDir + "/" + domid + "-" + r[12] + "-" + r[11] + ".moni", "a")
+                self.f = open(monitorDir + "/" + domid + "-" + r[12] + "-" + r[11] + ".moni", "a")
 
             self.setName("%s:%s" % (r[11], domid))
 
@@ -195,10 +197,10 @@ class Monitor(Thread):
         if (self.Disc == -1):
             self.Disc=r[9]
         self.q.setDAC(9, self.Disc)
-        print  >>sys.stderr, "Debug: Disc set to ", self.Disc
+        print("Debug: Disc set to ", self.Disc, file=sys.stderr)
 
         self.q.setSPEDeadtime(ScalerDeadTime)
-        print  >>sys.stderr, "Debug: Dead time set to ", ScalerDeadTime
+        print("Debug: Dead time set to ", ScalerDeadTime, file=sys.stderr)
 
         # set HV to the set point or to the Max Setting allowed:
         HVSet = r[10]
@@ -215,7 +217,7 @@ class Monitor(Thread):
 		HVSet=self.HighVoltage;
         self.q.enableHV()
         self.q.setHV(int(2*min(HVSet, r[13])))
-        print  >>sys.stderr, 'Debug: HV set to ', int(2*min(HVSet, r[13]))
+        print('Debug: HV set to ', int(2*min(HVSet, r[13])), file=sys.stderr)
 
 
 
@@ -234,7 +236,7 @@ class Monitor(Thread):
 	    lines=lines+1
 	    if (self.RunTime>0):
             	if (int(lines) > int(self.RunTime)):
-                	print >>sys.stderr, "Line limit reached. stopping"
+                	print("Line limit reached. stopping", file=sys.stderr)
                 	sys.exit()
 
             if tpc == 0:
@@ -247,7 +249,7 @@ class Monitor(Thread):
                 txt += " %.1f %d %d" % (temp, pressure, hv)
                 tpc = 10
             tpc -= 1
-            print >>self.f, txt
+            print(txt, file=self.f)
             self.f.flush()
 
         self.f.close()
@@ -261,7 +263,7 @@ for h in args:
     d = ServerProxy("http://" + h + ":7501")
     d.scan()
     doms = d.discover_doms()
-    for loc in doms.values():
+    for loc in list(doms.values()):
         port = 5000 + int(loc[0])*8 + int(loc[1])*2
         if loc[2] == 'B': port += 1
 	mm = Monitor(h, port, Disc, Gain, RunTime, ScalerDeadTime, HighVoltage)

@@ -1,18 +1,23 @@
-#!/bin/env python
+#!/usr/bin/env python
 """
 DOM Configuration module
 
 $Id: domconfiguration.py,v 1.7 2006/06/16 15:06:19 bvoigt Exp $
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
 ####################################################
 # Import section                                   #
 ####################################################
 
+from builtins import str
+from builtins import range
+from builtins import object
 import sys
 import math
 import warnings
-import databaseutil
+from . import databaseutil
 import time
 
 ####################################################
@@ -141,7 +146,7 @@ def getDefaultHV():
 # Class definition section                        #
 ###################################################
 
-class DOMConfigurator:
+class DOMConfigurator(object):
 
     """
     Digitial Optical Module configuration
@@ -278,7 +283,7 @@ class DOMConfigurator:
         # if a temperature is given try at first
         # to figure out which calibration set is the best for the given temp
         if isinstance(temp, int) \
-        or isinstance(temp, long) \
+        or isinstance(temp, int) \
         or isinstance(temp, float):
 
             sql = """
@@ -322,12 +327,12 @@ class DOMConfigurator:
         result = self.cursor.fetchall()
 
         if self.verbose:
-            print >> sys.stdout, "%s: DAC settings taken from DOMCal run on %s at %.2f C" \
-                  % (self.getSerialNumber(), result[0][2], result[0][3])
+            print("%s: DAC settings taken from DOMCal run on %s at %.2f C" \
+                  % (self.getSerialNumber(), result[0][2], result[0][3]), file=sys.stdout)
         if self.veryverbose:
-            print >> sys.stdout, "DAC settings are: "
+            print("DAC settings are: ", file=sys.stdout)
             for row in result:
-                print >> sys.stdout, "Channel %d: %d" % (row[0], row[1])
+                print("Channel %d: %d" % (row[0], row[1]), file=sys.stdout)
             
         settings = []
         for row in result:
@@ -352,7 +357,7 @@ class DOMConfigurator:
         # if a temperature is given try at first
         # to figure out which calibration set is the best for the given temp
         if isinstance(temp, int) \
-        or isinstance(temp, long) \
+        or isinstance(temp, int) \
         or isinstance(temp, float):
 
             sql = """
@@ -398,9 +403,9 @@ class DOMConfigurator:
         slope = result[1]
 
         if self.verbose:
-            print >> sys.stdout, ("%s: HV calibration settings taken from " + \
+            print(("%s: HV calibration settings taken from " + \
                   "DOMCal run on %s at %.2f C") \
-                  % (self.getSerialNumber(), result[2], result[3])
+                  % (self.getSerialNumber(), result[2], result[3]), file=sys.stdout)
 
         # DOMCal calculates the function log(gain) = intercept + slope * log(hv[V])
         # to get the HV in Volts the function has to be inverted and the result has

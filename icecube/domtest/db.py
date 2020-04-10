@@ -19,8 +19,10 @@ and keys:
 (C) 2005 Kael Hanson (kael.hanson@icecube.wisc.edu)
 """
 
+from future import standard_library
+standard_library.install_aliases()
 import MySQLdb
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 import os
 
 __config = ConfigParser()

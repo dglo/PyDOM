@@ -1,3 +1,4 @@
+from builtins import object
 import zlib
 from zipfile import ZipFile
 
@@ -5,7 +6,7 @@ HITS    = 1
 MONITOR = 2
 TIMECAL = 3
 
-class datafile:
+class dataopen(object):
     """Class datafile encapsulates the TestDAQ ZIP datafile"""
     def __init__(self, filename):
         self.filename = filename
@@ -25,12 +26,12 @@ class datafile:
         elif type == HITS:
             entry = [ n for n in self.zip.namelist() if n[-3:] == "hit" ][0]
         zinf  = self.zip.getinfo(entry)
-        return decostream(file(self.filename, "r"),
+        return decostream(open(self.filename, "r"),
                           zinf.file_offset,
                           zinf.file_offset + zinf.compress_size
                           )
 
-class decostream:
+class decostream(object):
     """Class decostream allows for decompression of ZIP entries
     without needing to read entire image into memory.  It supports
     reading arbitrary length fragments using the read() method."""

@@ -64,7 +64,7 @@ def findFile(dirList, fileList):
             if file is None:
                 continue
             testFile = os.path.join(dir, file)
-            if os.path.isfile(testFile):
+            if os.path.isopen(testFile):
                 return testFile
 
     return None
@@ -73,7 +73,7 @@ def findProperties():
     """Find configuration properties file."""
     configFile = findPropertiesFile()
     if configFile is None:
-        raise IOError, "Couldn't find configuration file"
+        raise IOError("Couldn't find configuration file")
 
     return readProperties(configFile)
 

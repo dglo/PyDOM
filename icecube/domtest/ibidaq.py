@@ -1,13 +1,20 @@
-#!/bin/env python
+#!/usr/bin/env python
 """
 IBI-DAQ is a Python class that talks to IceBoot
 and packages returned data in a convenient way.
 $Id: ibidaq.py,v 1.40 2006/01/24 20:34:08 kael Exp $
 """
+from __future__ import print_function
  
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
+from future.utils import raise_
 import socket
 import string
-import StringIO                 # Needed to unpack the acq dump strings
+import io                 # Needed to unpack the acq dump strings
 import struct                   # Ibid.
 import re
 import time
@@ -77,9 +84,9 @@ class IBEX(Exception):
     def __init__(self, hermes):
         self.hermes = hermes
     def __str__(self):
-        print self.hermes
+        print(self.hermes)
         
-class hit:
+class hit(object):
     """Waveform hit class.
     
     This class contains data members that hold information
@@ -167,11 +174,11 @@ class hit:
                     eng = eng + struct.pack('>H', self.atwb[i][j])
         return struct.pack('>H', len(eng)) + eng
 
-class dorint:
+class dorint(object):
     def __init__(self, device):
         """New create routine with driver buffersize discovery."""
         try:
-            f = file("/proc/driver/domhub/bufsiz", "rt")
+            f = open("/proc/driver/domhub/bufsiz", "rt")
             self.bsiz = int(f.read(20))
             f.close()
         except IOError:
@@ -190,7 +197,7 @@ class dorint:
             # says it's ready - otw it returns an error
             si, so, sx = select( [ self ], [], [], 30 )
             if not len(si):
-                raise IBEX, 'Timeout error.'
+                raise IBEX('Timeout error.')
             self.buffer += os.read(self.fd, self.bsiz)
         if len(self.buffer) <= size:
             ret = self.buffer
@@ -206,7 +213,7 @@ class dorint:
     def close(self):
         os.close(self.fd)
         
-class ibx:
+class ibx(object):
     """IceBoot connection class"""
     eol = re.compile('\s*\r\n\s*')
     SPEF_DELAY = 150000
@@ -219,7 +226,7 @@ class ibx:
         elif len(args) == 3:
             self.port = self.encodePort(args[0], args[1], args[2])
         else:
-            raise AttributeError, "Illegal argument list " + str(args)
+            raise_(AttributeError, "Illegal argument list " + str(args))
 
         if self.port is None:
             # interpret 'host' as device filename
@@ -252,8 +259,8 @@ class ibx:
                     try:
                         prompt = self.s.recv(_CHUNKSIZE)
                     except socket.error as msg:
-                        raise socket.error, 'Socket Error for ' + \
-                            self.portString() + ': ' + str(msg)
+                        raise_(socket.error, 'Socket Error for ' + \
+                            self.portString() + ': ' + str(msg))
                     #print "PROMPT[I]:",prompt
                     if prompt.find('>') >= 0:
                         break
@@ -282,8 +289,8 @@ class ibx:
                 try:
                     msg += self.s.recv(_CHUNKSIZE)
                 except socket.error as msg:
-                    raise socket.error, 'Socket Error for ' + \
-                        self.portString() + ': ' + str(msg)
+                    raise_(socket.error, 'Socket Error for ' + \
+                        self.portString() + ': ' + str(msg))
             else:
                 break
         return msg
@@ -294,23 +301,23 @@ class ibx:
         IceBoot command interpreter.
         """
         if DEBUG_LEVEL > 1:
-            print "Sending: " + command
+            print("Sending: " + command)
         self.s.send(command + '\r\n')
         reply = ''
         while reply[-3:] != '> \n':
             si, so, sx = select([ self.s ], [], [], self._timeout)
             if len(si) == 0:
-                raise IBEX, 'Timeout Error for ' + self.portString()
+                raise_(IBEX, 'Timeout Error for ' + self.portString())
             try:
                 rmadd = self.s.recv(_CHUNKSIZE)
             except socket.error as msg:
-                raise socket.error, 'Socket Error for ' + \
-                    self.portString() + ': ' + str(msg)
+                raise_(socket.error, 'Socket Error for ' + \
+                    self.portString() + ': ' + str(msg))
             if DEBUG_LEVEL > 5:
-                print rmadd
+                print(rmadd)
             reply = reply + rmadd
         if DEBUG_LEVEL > 4:
-            print "Reply: " + reply
+            print("Reply: " + reply)
         
         # Hunt the first CR+LF - echo separator
         sep = reply.find('\r\n')
@@ -319,19 +326,19 @@ class ibx:
         text = text[0:-3]
         
         if DEBUG_LEVEL > 2:
-            print 'Echoed:  ' + echo
-            print 'Message: ' + text 
+            print('Echoed:  ' + echo)
+            print('Message: ' + text) 
         
         return text.strip()
 
     def encodePort(cls, card, pair, domAB):
         """Encode card/pair/domAB into dtsx port"""
         if int(domAB) < 0 or int(domAB) > 1:
-            raise AttributeError, 'Illegal domAB value ' + str(domAB)
+            raise_(AttributeError, 'Illegal domAB value ' + str(domAB))
         elif int(pair) < 0 or int(pair) > 3:
-            raise AttributeError, 'Illegal pair value ' + str(pair)
+            raise_(AttributeError, 'Illegal pair value ' + str(pair))
         elif int(card) < 0 or int(card) > 31:
-            raise AttributeError, 'Illegal card value ' + str(card)
+            raise_(AttributeError, 'Illegal card value ' + str(card))
 
         return 5000 + (int(card) * 8) + (int(pair) * 2) + int(domAB)
 
@@ -348,9 +355,9 @@ class ibx:
 
         port = port - 5000
         domAB = port % 2
-        port = port / 2
+        port = port // 2
         pair = port % 4
-        port = port / 4
+        port = port // 4
         card = port
         return (card, pair, domAB)
 
@@ -387,7 +394,7 @@ class ibx:
         while len(data) < 4*count:
             si, so, sx = select([ self.s ], [], [], self._timeout)
             if len(si) == 0:
-                raise IBEX, 'Timeout Error'
+                raise IBEX('Timeout Error')
             buf = self.s.recv(_CHUNKSIZE)
             nzb += len(buf)
             data += deco.decompress(buf)
@@ -528,7 +535,7 @@ class ibx:
         else:
             raise IBEX('Unknown trigger mode ' + mode)
         self.send('%s %s acq-%s' % (nsample, format, mstr))
-        z = StringIO.StringIO(self.zdump(node, 0x1000000))
+        z = io.StringIO(self.zdump(node, 0x1000000))
         # now - parse the zdump into a managable data structure
         acqlist = [ ]
         while z.pos < z.len:
@@ -563,14 +570,14 @@ class ibx:
         clk = self.send('%s @ . drop %s @ . drop' % (
             forthHex(FPGA_CLOCK_LOW),
             forthHex(FPGA_CLOCK_HI))).split()
-        return long(clk[0]) + pow(2, 32) * long(clk[1])
+        return int(clk[0]) + pow(2, 32) * int(clk[1])
         
 def unpack_octal_dump(zlist):
     qlist = []
     for k in range(0, 640):
         z = zlist.pop(0)
         if DEBUG_LEVEL > 4:
-            print 'unpack_octal_dump(): %d %s' % (k, z) 
+            print('unpack_octal_dump(): %d %s' % (k, z)) 
         if k % 5:
             qlist.append(int(z, 16))
     return qlist
@@ -593,7 +600,7 @@ def unpack_odx_clock(zlist):
     clkh = zlist.pop(0)
     res0 = zlist.pop(0)
     res1 = zlist.pop(0)
-    return (long(clkh + clkl, 16), long(res1 + res0, 16))
+    return (int(clkh + clkl, 16), int(res1 + res0, 16))
     
 def forthHex(anum):
     return '$%x' % anum

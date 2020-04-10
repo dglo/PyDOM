@@ -1,4 +1,6 @@
 
+from builtins import range
+from builtins import object
 import re
 import MySQLdb
 from icecube.domtest.db import get_db_connection
@@ -19,7 +21,7 @@ def mbid2prodid(mbid):
         __m2p_map[mbid] = DOMConfigurator(db, mbid)
     return __m2p_map[mbid].prodId
         
-class MonitorEOFException:
+class MonitorEOFException(object):
     pass
  
 class UTC(tzinfo):
@@ -35,7 +37,7 @@ class UTC(tzinfo):
 
 utc = UTC()
           
-class MoniFile:
+class MoniFile(object):
     """
     Does moni file things
     """
@@ -73,7 +75,7 @@ class MoniFile:
         while self.nextRecord() and self.t < tseek: pass
         return self.t >= tseek
         
-class LUXFile:
+class LUXFile(object):
     """
     This class encapsulates a LUX run.  This class has the
     following public fields:
@@ -122,7 +124,7 @@ class LUXFile:
         for run in self.runs:
             run.processMonitorFile(f)
 
-class LUXIlluminator:
+class LUXIlluminator(object):
     """
     Generic illuminator activity descriptor.  Fields are
         .t0 : illuminator start time
@@ -154,7 +156,7 @@ class LUXLaser(LUXIlluminator):
         self.freq = freq
         
     def todb(self, c):
-        for mbid, rate in self.avg_rate.items():
+        for mbid, rate in list(self.avg_rate.items()):
             if mbid in self.run.baseline:
                 prod_id = mbid2prodid(mbid)
                 bkg = self.run.baseline[mbid][1]
@@ -182,7 +184,7 @@ class LUXMono(LUXIlluminator):
         self.wavelength = wavelength
         
     def todb(self, c):
-        for mbid, rate in self.avg_rate.items():
+        for mbid, rate in list(self.avg_rate.items()):
             if mbid in self.run.baseline:
                 prod_id = mbid2prodid(mbid)
                 bkg = self.run.baseline[mbid][1]
@@ -200,7 +202,7 @@ class LUXMono(LUXIlluminator):
                     )
                 )
         
-class LUXRun:
+class LUXRun(object):
     """
     Class holding LUX run information:
         - begin_time  beginning of run

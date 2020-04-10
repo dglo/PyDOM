@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 """
 Local Coincidence test module
@@ -24,7 +24,11 @@ or
 etc.
 
 """
+from __future__ import print_function
 
+from past.builtins import cmp
+from builtins import range
+from builtins import object
 import sys, os, time, math
 from struct import *
 from icecube.daq import domapp
@@ -33,7 +37,7 @@ from icecube.domtest.rapcal import RAPCal
 from icecube.domtest.hits import domhit
 from icecube.domtest.lightsource import pulser
 
-class dom_harness:
+class dom_harness(object):
 
     def __init__(self, cwd):
         self.card = int(cwd[0])
@@ -103,7 +107,7 @@ class dom_harness:
         buf = os.read(ft, 292)
         os.close(ft)
         if len(buf) != 292:
-            print >>sys.stderr, "ERROR: short TCAL read (%d bytes)" % len(buf)
+            print("ERROR: short TCAL read (%d bytes)" % len(buf), file=sys.stderr)
             return
         rc = RAPCal(buf[4:])
         rc.setGPSString(self.gpsbuf)
@@ -203,19 +207,19 @@ if __name__ == "__main__":
     while len(hup) < nacq or len(hdn) < nacq:
         hup += dom_up.get_hits()
         hdn += dom_dn.get_hits()
-        print len(hup), len(hdn)
+        print(len(hup), len(hdn))
         loop_counter += 1
         if (len(hup) == 0 or len(hdn) == 0) and loop_counter > 1000: break
 
     p.allOff()
     
-    print "up rate:", calc_rate(hup)
-    print "dn rate:", calc_rate(hdn)
+    print("up rate:", calc_rate(hup))
+    print("dn rate:", calc_rate(hdn))
     hits = hup + hdn
     hits.sort(lambda x, y: cmp(x.utclk, y.utclk))
 
     nlc = 0
-    flog = file('testLC.dat', 'w')
+    flog = open('testLC.dat', 'w')
 
     dtlist = []
     for i in range(1, len(hits)):
@@ -229,13 +233,13 @@ if __name__ == "__main__":
             h1 = tmp
             dt = -dt
         nlc += 1
-        print >>flog, dt, max(h0.atwd[0]), max(h1.atwd[0]), \
-              h0.evt_trig_flag, h1.evt_trig_flag
+        print(dt, max(h0.atwd[0]), max(h1.atwd[0]), \
+              h0.evt_trig_flag, h1.evt_trig_flag, file=flog)
         dtlist.append(dt)
         
-    print >>sys.stderr, nlc, len(hits), \
+    print(nlc, len(hits), \
           "frac = %.1f%%" % (100.0*float(nlc)/len(hits)), \
-          "mean = %.1f, std = %.1f" % meanstd(dtlist)
+          "mean = %.1f, std = %.1f" % meanstd(dtlist), file=sys.stderr)
     flog.close()
 
     dom_up.app.endRun()
