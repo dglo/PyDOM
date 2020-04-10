@@ -2,6 +2,8 @@
 #
 # functions for starting a Unix daemon
 
+from builtins import str
+from builtins import range
 import os, signal, sys, time
 import traceback
 
@@ -67,7 +69,7 @@ def create(inFile='/dev/null', outFile='/dev/null', errFile='/dev/null',
 def get_pid(pidFile):
     """Get process ID from the PID file."""
     try:
-        pf  = file(pidFile, 'r')
+        pf  = open(pidFile, 'r')
         pid = int(pf.read().strip())
         pf.close()
     except IOError:

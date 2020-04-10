@@ -1,4 +1,4 @@
-#! /bin/env python
+#!/usr/bin/env python
 
 ###
 #
@@ -17,6 +17,7 @@ USAGE
     ot.py [ options ] <datafile.hit> <domcal_1.xml> <domcal_2.xml> ...
     
 """
+from __future__ import print_function
 
 import sys
 from icecube.domtest.domcal import calibrator
@@ -42,10 +43,10 @@ calibs = dict()
 while len(args) > 0:
     calfile = args.pop(0)
     cal = calibrator(calfile)
-    print >>sys.stderr, "Loaded calibration for DOM", cal.domid
+    print("Loaded calibration for DOM", cal.domid, file=sys.stderr)
     calibs[cal.domid] = cal
     
-f = file(hitfile, 'rb')
+f = open(hitfile, 'rb')
 while n > 0:
     n -= 1
     hit = nextHit(f)
@@ -64,4 +65,4 @@ while n > 0:
     # Don't process this waveform if things look funny
     if len(e10) != 2 or len(e90) != 2: continue
     risetime = 1000.0 / atwd_freq * (e90[0].x - e10[0].x)
-    print hit.domid, risetime
+    print(hit.domid, risetime)

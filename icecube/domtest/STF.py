@@ -27,11 +27,15 @@ Then you transform the STF result IDs into STFResult objects using
 the constructor function:
     >>> rvec = [ STFResult(db, x) for x in stf_result_ids ]
 """
+from __future__ import print_function
 
+from builtins import str
+from builtins import object
+from future.utils import raise_
 from array import array
 
 
-class STFResult:
+class STFResult(object):
     """
     STF result base class - has info from the STFResult table
     Get the information contained in the <code>STFResult</code>
@@ -96,7 +100,7 @@ class STFResult:
             try:
                 return self.getParameter(name)
             except LookupError:
-                raise AttributeError, "attribute " + str(name) + " does not exist."
+                raise_(AttributeError, "attribute " + str(name) + " does not exist.")
         
     def getParameters(self):
         """
@@ -141,7 +145,7 @@ class STFResult:
         )
         a = c.fetchall()
         if len(a) == 0:
-            raise LookupError, "Parameter " + param_name + " not found."
+            raise_(LookupError, "Parameter " + param_name + " not found.")
         elif len(a) == 1:
             return a[0][1]
         else:
@@ -186,7 +190,7 @@ def waive_failure(s, verbose=False):
             pex = int(s.pulser_amplitude_uvolt) * 8 / 5000
             # Expand the window a bit - use +/- 60% inv. +/- 50%
             if verbose:
-                print 'Checking whether amplitude %i > %i and %i < %s' % (amp, 0.4*pex, amp, 1.6 * pex)
+                print('Checking whether amplitude %i > %i and %i < %s' % (amp, 0.4*pex, amp, 1.6 * pex))
                 
             return amp > 0.4 * pex and amp < 1.6 * pex
         
@@ -195,15 +199,15 @@ def waive_failure(s, verbose=False):
             err = int(s.max_current_err_pct)
             min_peak_brite = int(s.min_peak_brightness_atwd)
             slope = 0.01 * int(s.min_slope_x_100)
-            print verbose
+            print(verbose)
             if verbose:
-                print 'Checking whether slope %i > 1.0 and peak brightness %i > 300 and error %i < 10' % (slope, min_peak_brite, err)
+                print('Checking whether slope %i > 1.0 and peak brightness %i > 300 and error %i < 10' % (slope, min_peak_brite, err))
             return slope > 1.0 and min_peak_brite > 300 and err < 10
         
     elif s.test_name == 'flasher_width':
         if s.test_version == '1.3':
             if verbose:
-                print 'Checking whether missing width %i < 15' % s.missing_width
+                print('Checking whether missing width %i < 15' % s.missing_width)
                 
             return int(s.missing_width) <= 15
         
@@ -213,7 +217,7 @@ def waive_failure(s, verbose=False):
             read = 0.001 * int(s.hv_worst_read_mvolt)
             f = set / read
             if verbose:
-                print 'Checking whether ratio set/read %f > 0.985 and %f < 1.015' % (f, f)
+                print('Checking whether ratio set/read %f > 0.985 and %f < 1.015' % (f, f))
                 
             return f > 0.985 and f < 1.015
         
@@ -223,7 +227,7 @@ def waive_failure(s, verbose=False):
         amp = int(s.atwd_waveform_amplitude)
         ampex = int(s.atwd_expected_amplitude)
         if verbose:
-            print 'Checking whether pos %i > 2 and %i < 10 and width %i < 6 and amp %i > %i and %i < %i' % (pos, wid, amp, 0.5*ampex, amp, 1.5*ampex)  
+            print('Checking whether pos %i > 2 and %i < 10 and width %i < 6 and amp %i > %i and %i < %i' % (pos, wid, amp, 0.5*ampex, amp, 1.5*ampex))  
         return pos > 2 and pos < 10 and wid < 6 and \
             amp > 0.5*ampex and amp < 1.5 * ampex
     else:

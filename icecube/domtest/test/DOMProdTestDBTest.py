@@ -2,6 +2,8 @@
 #
 # DOMProdTestDB unit tests
 
+from builtins import str
+from builtins import range
 import socket
 import unittest
 from icecube.domtest.DOMProdTestDB import DOMProdTestDB, FATData, FATRun

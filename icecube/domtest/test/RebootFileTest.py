@@ -2,12 +2,16 @@
 #
 # RebootFile unit tests
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 import time
 import unittest
 from icecube.domtest.DOMProdTestDB import DOMProdTestDB
 from icecube.domtest.RebootFile import DOM, RebootFile
 from MockDB import MockDB, MockConnection, MockCursor
-import cStringIO
+import io
 
 #class FakeData:
 #    def __init__(self, baseId):
@@ -268,7 +272,7 @@ class testRebootFile(unittest.TestCase):
         conn.verify()
 
     def testReadEmpty(self):
-        strIO = cStringIO.StringIO('')
+        strIO = io.StringIO('')
         results = RebootFile.read(strIO)
         self.assertEqual(results, None,
                         'Expected no results')
@@ -282,14 +286,14 @@ class testRebootFile(unittest.TestCase):
         temp = -10.10
 
         lcStr = self.fakeSuccess(hub, dorAddr, timeList, name, mbId, temp)
-        strIO = cStringIO.StringIO(lcStr)
+        strIO = io.StringIO(lcStr)
         results = RebootFile.read(strIO)
         self.failUnless(isinstance(results, dict),
                         'Expected RebootFile.read() to return' +
                         ' a dictionary object, not ' + str(type(results)))
         self.assertEqual(len(results), 1,
                         'Expected 1 result, not ' + str(len(results)))
-        for k in results.keys():
+        for k in list(results.keys()):
             self.assertEqual(results[k].name, name,
                              'Expected ' + k + ' name to be ' + name +
                              ', not ' + results[k].name)
@@ -331,14 +335,14 @@ class testRebootFile(unittest.TestCase):
                                                  name, mbId, temp)
                 expSuccess = expSuccess + 1
 
-        strIO = cStringIO.StringIO(lcStr)
+        strIO = io.StringIO(lcStr)
         results = RebootFile.read(strIO)
         self.failUnless(isinstance(results, dict),
                         'Expected RebootFile.read() to return' +
                         ' a dictionary object, not ' + str(type(results)))
         self.assertEqual(len(results), 1,
                         'Expected 1 result, not ' + str(len(results)))
-        for k in results.keys():
+        for k in list(results.keys()):
             self.assertEqual(results[k].name, name,
                              'Expected ' + k + ' name to be ' + name +
                              ', not ' + results[k].name)

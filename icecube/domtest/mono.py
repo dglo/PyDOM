@@ -14,6 +14,7 @@ thing.  Usage typically proceeds as such:
         >>> m.goto(5320)
 """
 
+from builtins import object
 import socket
 import struct
 
@@ -22,7 +23,7 @@ MICRONS    = 0
 NANOMETERS = 1
 ANGSTROMS  = 2
 
-class Digikrom:
+class Digikrom(object):
     
     def __init__(self, host, port):
         """Open a connection to the monochromator over TCP sockets."""

@@ -2,12 +2,16 @@
 #
 # DOMHub XML-RPC daemon
 
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import os, re, signal, socket, string, sys, traceback
-from xmlrpclib import ServerProxy
-from SimpleXMLRPCServer import SimpleXMLRPCServer
+from xmlrpc.client import ServerProxy
+from xmlrpc.server import SimpleXMLRPCServer
 
-import daemon
-from dor import Driver
+from . import daemon
+from .dor import Driver
 
 # list of valid clients
 #accessList=('127.0.0.1')
@@ -17,7 +21,7 @@ def jarFilter(file_list, dirname, names):
     for name in names:
         if name.endswith('.jar'):
             fullpath = os.path.join(dirname, name)
-            if os.path.isfile(fullpath):
+            if os.path.isopen(fullpath):
                 file_list.append(fullpath)
 
 class XMLServer(SimpleXMLRPCServer):
@@ -44,7 +48,7 @@ class XMLServer(SimpleXMLRPCServer):
         except:
             return 1
 
-class HubSysDep:
+class HubSysDep(object):
     """System-dependent HubDaemon data"""
 
     def __init__(self):
@@ -88,7 +92,7 @@ class HubSysDep:
     def initLog(self):
         """initialize domhubapp.log"""
         logFile = os.path.join(self.homeDir, 'domhubapp.log')
-        f = file(logFile, 'w')
+        f = open(logFile, 'w')
         f.write("\n")
         f.write('STARTING DOMHUBAPP ' + os.popen('date').read() + "\n")
         f.write("\n")
@@ -179,7 +183,7 @@ class HubSysDep:
         daemon.run(javaBin + ' ' + domhubClass + ' ' + domhubProperties,
                    outFile=logFile, errFile=logFile, pidFile=pidFile)
 
-class HubDaemon:
+class HubDaemon(object):
     """Daemon which runs software on the DOMHub"""
 
     def __init__(self, sysDep, driver=None):
@@ -202,7 +206,7 @@ class HubDaemon:
 
     def _dispatch(self, method, params):
         """Hack around Linux python bug"""
-        return apply(getattr(self, method), params)
+        return getattr(self, method)(*params)
 
     def disableBlocking(self):
         """Disable blocking"""

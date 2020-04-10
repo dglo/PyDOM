@@ -1,4 +1,5 @@
 
+from builtins import range
 from icecube.daq.hits import domhit
 from icecube.daq.slchit import DeltaCompressedHit
 from struct import unpack

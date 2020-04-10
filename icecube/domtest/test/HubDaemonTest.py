@@ -2,11 +2,14 @@
 #
 # HubDaemon unit tests
 
+from builtins import str
+from builtins import object
+from future.utils import raise_
 import unittest
 import sys
 from icecube.domtest.HubDaemon import HubSysDep, HubDaemon
 
-class MockError(StandardError):
+class MockError(Exception):
     """Error in MockDriver"""
 
 class MockSysDep(HubSysDep):
@@ -24,8 +27,8 @@ class MockSysDep(HubSysDep):
 
     def expectStartDomHubApp(self, pidFile=None):
         if self.expDomHubAppPid is not None:
-            raise MockError, 'domhub-app PID file was already set to "' + \
-                self.expDomHubAppPid + '"'
+            raise_(MockError, 'domhub-app PID file was already set to "' + \
+                self.expDomHubAppPid + '"')
         if pidFile is None:
             self.expDomHubAppPid = self.domhubAppPid
         else:
@@ -33,11 +36,11 @@ class MockSysDep(HubSysDep):
 
     def addExpectedJarList(self, workDir, jars):
         if not isinstance(jars, list):
-            raise MockError, 'Argument should be a list, not ' + \
-                str(type(jars))
+            raise_(MockError, 'Argument should be a list, not ' + \
+                str(type(jars)))
         if workDir in self.expJarList:
-            raise MockError, 'Cannot use multiple instances of' + \
-                ' working directory "' + workDir + '"'
+            raise_(MockError, 'Cannot use multiple instances of' + \
+                ' working directory "' + workDir + '"')
         self.expJarList[workDir] = jars
 
     def addKillDomProcessesReturnValue(self, val):
@@ -51,26 +54,26 @@ class MockSysDep(HubSysDep):
 
     def addStartDaemon(self, progName, pidFile):
         if progName in self.expStartDaemon:
-            raise MockError, 'Cannot kill "' + progName + '" multiple times'
+            raise_(MockError, 'Cannot kill "' + progName + '" multiple times')
         self.expStartDaemon[progName] = pidFile
 
     def getJarList(self, workDir):
         if workDir not in self.expJarList:
-            raise MockError, 'No jar list for for "' + workDir + '"'
+            raise_(MockError, 'No jar list for for "' + workDir + '"')
         list = self.expJarList[workDir]
         del self.expJarList[workDir]
         return list
 
     def killDomProcesses(self):
         if len(self.expKillDomProcs) == 0:
-            raise MockError, 'Unexpected call to killDomProcesses()'
+            raise MockError('Unexpected call to killDomProcesses()')
         rtnVal = self.expKillDomProcs[0]
         del self.expKillDomProcs[0]
         return rtnVal
 
     def killProcess(self, progName):
         if progName not in self.expKillProc:
-            raise MockError, 'Unexpected call to killProcess(' + progName + ')'
+            raise_(MockError, 'Unexpected call to killProcess(' + progName + ')')
         if self.expKillProc[progName] == 1:
             del self.expKillProc[progName]
         else:
@@ -78,45 +81,45 @@ class MockSysDep(HubSysDep):
 
     def runDtsxAll(self):
         if self.expDtsxAll == 0:
-            raise MockError, 'Unexpected call to runDtsxAll()'
+            raise MockError('Unexpected call to runDtsxAll()')
         self.expDtsxAll = self.expDtsxAll - 1
         return 'Ran dtsxall'
 
     def startDaemon(self, progName, pidFile):
         if progName not in self.expStartDaemon:
-            raise MockError, 'Did not expect to start "' + progName + \
-                '" daemon'
+            raise_(MockError, 'Did not expect to start "' + progName + \
+                '" daemon')
 
         expPid = self.expStartDaemon[progName]
         del self.expStartDaemon[progName]
 
         if expPid != pidFile:
-            raise MockError, 'Expected "' + progName + '" PID file to be "' + \
-                expPid + '", not "' + pidFile + '"'
+            raise_(MockError, 'Expected "' + progName + '" PID file to be "' + \
+                expPid + '", not "' + pidFile + '"')
 
     def startDomHubApp(self, pidFile):
         if self.expDomHubAppPid != pidFile:
-            raise MockError, 'Expected domhub-app PID file to be "' + \
-                self.expDomHubAppPid + '", not "' + pidFile + '"'
+            raise_(MockError, 'Expected domhub-app PID file to be "' + \
+                self.expDomHubAppPid + '", not "' + pidFile + '"')
         self.expDomHubAppPid = None
 
     def verify(self):
         if self.expDtsxAll > 0:
-            raise MockError, 'Expected ' + str(self.expDtsxAll) + \
-                ' calls to runDtsxAll()'
+            raise_(MockError, 'Expected ' + str(self.expDtsxAll) + \
+                ' calls to runDtsxAll()')
         if len(self.expJarList) > 0:
-            raise MockError, 'Expected ' + str(len(self.expJarList)) + \
-                ' calls to getJarList()'
+            raise_(MockError, 'Expected ' + str(len(self.expJarList)) + \
+                ' calls to getJarList()')
         if len(self.expKillDomProcs) > 0:
-            raise MockError, 'Expected ' + str(len(self.expKillDomProcs)) + \
-                ' calls to killDomProcesses()'
+            raise_(MockError, 'Expected ' + str(len(self.expKillDomProcs)) + \
+                ' calls to killDomProcesses()')
         if len(self.expStartDaemon) > 0:
-            raise MockError, 'Expected ' + str(len(self.expStartDaemon)) + \
-                ' calls to startDaemon()'
+            raise_(MockError, 'Expected ' + str(len(self.expStartDaemon)) + \
+                ' calls to startDaemon()')
         if self.expDomHubAppPid is not None:
-            raise MockError, 'Expected call to startDomHubApp()'
+            raise MockError('Expected call to startDomHubApp()')
 
-class MockDriver:
+class MockDriver(object):
     def __init__(self):
         self.expActiveDoms = None
         self.expDisableBlocking = 0
@@ -126,7 +129,7 @@ class MockDriver:
 
     def disable_blocking(self):
         if self.expDisableBlocking == 0:
-            raise MockError, 'Unexpected call to disable_blocking'
+            raise MockError('Unexpected call to disable_blocking')
         self.expDisableBlocking = self.expDisableBlocking - 1
 
     def expectDisableBlocking(self, num=1):
@@ -143,47 +146,47 @@ class MockDriver:
 
     def get_active_doms(self):
         if self.expActiveDoms is None:
-            raise MockError, 'Unexpected call to getActiveDoms()'
+            raise MockError('Unexpected call to getActiveDoms()')
         active = self.expActiveDoms
         self.expActiveDoms = None
         return active
 
     def go_to_iceboot(self):
         if self.expGoToIceBoot == 0:
-            raise MockError, 'Unexpected call to disable_blocking'
+            raise MockError('Unexpected call to disable_blocking')
         self.expGoToIceBoot = self.expGoToIceBoot - 1
 
     def offAll(self):
         if self.expOffAll == 0:
-            raise MockError, 'Unexpected call to offAll'
+            raise MockError('Unexpected call to offAll')
         self.expOffAll = self.expOffAll - 1
 
     def onAll(self):
         if self.expOnAll == 0:
-            raise MockError, 'Unexpected call to onAll'
+            raise MockError('Unexpected call to onAll')
         self.expOnAll = self.expOnAll - 1
 
     def setExpectedActiveDoms(self, doms):
         if not isinstance(doms, dict):
-            raise MockError, 'Argument should be a dictionary, not ' + \
-                str(type(doms))
+            raise_(MockError, 'Argument should be a dictionary, not ' + \
+                str(type(doms)))
         self.expActiveDoms = doms
 
     def verify(self):
         if self.expActiveDoms is not None:
-            raise MockError, 'get_active_doms() was never called'
+            raise MockError('get_active_doms() was never called')
         if self.expDisableBlocking > 0:
-            raise MockError, 'Expected ' + str(self.expDisableBlocking) + \
-                ' calls to disable_blocking()'
+            raise_(MockError, 'Expected ' + str(self.expDisableBlocking) + \
+                ' calls to disable_blocking()')
         if self.expGoToIceBoot > 0:
-            raise MockError, 'Expected ' + str(self.expGoToIceBoot) + \
-                ' calls to go_to_iceboot()'
+            raise_(MockError, 'Expected ' + str(self.expGoToIceBoot) + \
+                ' calls to go_to_iceboot()')
         if self.expOffAll > 0:
-            raise MockError, 'Expected ' + str(self.expOffAll) + \
-                ' calls to offAll()'
+            raise_(MockError, 'Expected ' + str(self.expOffAll) + \
+                ' calls to offAll()')
         if self.expOnAll > 0:
-            raise MockError, 'Expected ' + str(self.expOnAll) + \
-                ' calls to offAll()'
+            raise_(MockError, 'Expected ' + str(self.expOnAll) + \
+                ' calls to offAll()')
 
 class testHubDaemon(unittest.TestCase):
     """Unit tests for HubDaemon class"""
@@ -219,7 +222,7 @@ class testHubDaemon(unittest.TestCase):
         self.assertEqual(len(result), len(expList), 'Expected ' +
                          str(len(expList)) + ' doms, not ' +
                          str(len(result)))
-        for k in expList.keys():
+        for k in list(expList.keys()):
             self.failUnless(k in result, 'Could not find DOM ' + k)
             self.assertEqual(expList[k], result[k], 'Expected dom ' + str(k) +
                              ' to be "' + str(expList[k]) + '", not "' +

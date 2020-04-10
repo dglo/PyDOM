@@ -17,6 +17,10 @@ Kael Hanson : 2005-05-27
 
 *** CHANGES ***
 
+Changed in Version 4.3
+----------------------
+*) Added Python3 compatibility
+
 Changed in Version 3.9
 ----------------------
 *) Added the icecube.domtest.testdaq module

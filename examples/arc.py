@@ -1,12 +1,13 @@
-#! /bin/env python
+#!/usr/bin/env python
 
+from __future__ import print_function
 import os, sys
 import struct
 from icecube.domtest import rapcal, hits, domcal
 from getopt import getopt
 
 def usage():
-    print >>sys.stderr, "usage: arc [ -h | -n <#> | -T ] <basename>"
+    print("usage: arc [ -h | -n <#> | -T ] <basename>", file=sys.stderr)
     
 maxrec = 1000000000
 do_tcal = False
@@ -23,8 +24,8 @@ for o, a in opts:
         
 basename = args.pop(0)
 
-fhit = file(basename + '.hit', 'rb')
-tcal = rapcal.TimeCalibrator(file(basename + '.tcal', 'rb'))
+fhit = open(basename + '.hit', 'rb')
+tcal = rapcal.TimeCalibrator(open(basename + '.tcal', 'rb'))
 fout = dict()
 
 nrec = 0
@@ -42,7 +43,7 @@ while nrec < maxrec:
         tcal.translateDOMtoDOR(hit)
         utc = hit.utclk
     if mbid not in fout:
-        fout[mbid] = file(("%12.12x" % mbid) + '.hit', 'wb')
+        fout[mbid] = open(("%12.12x" % mbid) + '.hit', 'wb')
     fout[mbid].write(
         struct.pack(
             '>iiqiiq', recl, fmt, mbid, 0, 0, utc

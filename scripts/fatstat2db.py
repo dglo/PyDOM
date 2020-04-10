@@ -2,6 +2,8 @@
 #
 # Parse histo-clean (monitoring) data
 
+from builtins import str
+from builtins import range
 import os, sys
 from icecube.domtest.DOMProdTestDB import DOMProdTestDB, FATRun
 from icecube.domtest.LCChainFile import LCChainFile

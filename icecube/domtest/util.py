@@ -1,17 +1,24 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #
 # The DOM utility package
 #
 # $Id: util.py,v 1.6 2005/12/25 22:46:20 kael Exp $
 #
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
+from future.utils import raise_
 import sys, os, time, math, struct
 from icecube.domtest.hits import domhit
-from ConfigParser import ConfigParser
-from PyBook import Histogram
+from configparser import ConfigParser
+from .PyBook import Histogram
 from numpy import array, arange, zeros, sum, sqrt
 from numpy.numarray import matrixmultiply
 from numpy.numarray.linear_algebra import linear_least_squares, eigenvalues
-from cStringIO import StringIO
+from io import StringIO
 
 debug = 1
 
@@ -51,7 +58,7 @@ def readDHHits(f):
         buf = f.read(length-16)
         if type == 2:
             mbid = "%12.12x" % mbid
-            print length, type, mbid
+            print(length, type, mbid)
             if mbid not in d:
                 d[mbid] = []
 
@@ -79,8 +86,8 @@ def configDefault(q, hvon=0):
         try:
             hv = config.getint('Nominal HV', q.getId())
         except:
-            print >> sys.stderr, 'WARNING in util.configDefault() - cannot ' \
-                  + 'find default HV for DOM ID', q.getId()
+            print('WARNING in util.configDefault() - cannot ' \
+                  + 'find default HV for DOM ID', q.getId(), file=sys.stderr)
             hv = 2800
         q.setHV(hv)
     else:
@@ -148,7 +155,7 @@ def ped_noise(q, nseq=101, ncyc=10):
         chs.append((mvn[ich], mvx[ich], v))
     return chs
 
-class PMTGainCalibrator:
+class PMTGainCalibrator(object):
     """Calibrate the PMT gain using darkcount photons."""
     def __init__(self, q, cal) :
         
@@ -169,10 +176,10 @@ class PMTGainCalibrator:
         self.dataPoint   = [ ]
         for hv in self.hv:
 
-            print >> sys.stderr, "Gathering SPE distribution for HV = ", hv
+            print("Gathering SPE distribution for HV = ", hv, file=sys.stderr)
             self.q.setHV(hv)
             gmax = math.ceil(pow(10.0, 6.37*math.log10(hv)-21.0))
-            print >> sys.stderr, "HV: ", hv, "gmax: ", gmax
+            print("HV: ", hv, "gmax: ", gmax, file=sys.stderr)
             hist = Histogram(
                 'Charge Histogram for DOM %s - %d VDC' % (self.q.getId(), hv),
                 200, 0.0, gmax)
@@ -204,7 +211,7 @@ class PMTGainCalibrator:
                                 hist.fill(pc)
                                 break
                 except IBEX as ibex:
-                    print "Caught IBEX error:", ibex, "for DOM", self.q.getId()
+                    print("Caught IBEX error:", ibex, "for DOM", self.q.getId())
 
             spe = spefit(hist.x(), hist.h)
             self.dataPoint.append((hv, hist, spe))
@@ -258,7 +265,7 @@ def time_resolution(q, cal, pulse_period, threshold=0.0025, nseq=501, ncyc=10):
     tres_fill(hqx, cal, pulse_period, threshold, bias, freq, that)
 
     tmax, bin = that.getMaximum()
-    print "TRES Correction:", tmax, bin
+    print("TRES Correction:", tmax, bin)
     
     hres = Histogram("Time Resolution - DOM %s - Pulse Period %.3g" \
                      % (id, pulse_period), 100, bin-10, bin+10)
@@ -273,7 +280,7 @@ def time_resolution(q, cal, pulse_period, threshold=0.0025, nseq=501, ncyc=10):
 
     return hres, qres
 
-class edge:
+class edge(object):
     def __init__(self, slope, x):
         self.slope = slope
         self.x = x
@@ -356,7 +363,7 @@ def occupancy(q, p, rate, aperture=10, pulse='fast'):
     dt   = 10.0 / aperture
     return ( x / float(rate), xerr / rate )
 
-class spefit:
+class spefit(object):
     """Fit a PMT P/H and/or charge distribution.  Trick is
     to approximate the distribution to a 5th-order polynomial
     and then the roots of the 4th-order derivative polynomial
@@ -436,14 +443,14 @@ class spefit:
             self.rss = 0.0
 
         if debug > 5:
-            print >> sys.stderr, "Solution vector: ", self.b, " RSS: ", self.rss
+            print("Solution vector: ", self.b, " RSS: ", self.rss, file=sys.stderr)
             
         # derivative polynomial - flip around so n-th order polynomial
         # coefficient is in 1st slot
         d = self.b[1:] * (arange(len(self.b)-1)+1)
         
         if debug > 5:
-            print >> sys.stderr, "Derivative polynomial coeff: ", d
+            print("Derivative polynomial coeff: ", d, file=sys.stderr)
             
         z = roots(d[-1::-1])
 
@@ -453,7 +460,7 @@ class spefit:
             # ID the real roots
             rz = [ ez.real for ez in z if ez.imag == 0 ]
         else:
-            raise TypeError, z.type
+            raise_(TypeError, z.type)
 
         if len(rz) == 0:
             return
@@ -461,7 +468,7 @@ class spefit:
         # Then apply various heuristic criteria
         # - first, ensure that the roots are within the
         # specified range of the fit
-        rz = sorted(filter(lambda u: u > x[x0] and u < x[x1], rz))
+        rz = sorted([u for u in rz if u > x[x0] and u < x[x1]])
         
         # Ask for concave up followed by concave down that is max
         dd = d[1:] * arange(1, len(d))

@@ -1,7 +1,8 @@
+from __future__ import print_function
 from distutils.core import setup
 import sys, string, os
 
-print "*****", os.getcwd(), "*****"
+print("*****", os.getcwd(), "*****")
 scfiles=[ 'scripts/HubDaemon.py',
           'scripts/add-fat.py',
           'scripts/autogen-steering',
@@ -20,7 +21,7 @@ scfiles=[ 'scripts/HubDaemon.py',
           ]
 setup(
     name='PyDOM',
-    version='4.2.0',
+    version='4.3.0',
     description='Python classes to interact with IceCube DOMs',
     long_description="""
         IceCube Project Python interface to DOMs and DOMHubs.

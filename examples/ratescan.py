@@ -1,5 +1,7 @@
-#!/bin/env python
+#!/usr/bin/env python
 
+from __future__ import print_function
+from builtins import range
 import sys, time
 import icecube.domtest.ibidaq as daq
 from getopt import getopt
@@ -54,7 +56,7 @@ for dac in range(d0, d1, step):
         time.sleep(0.150)
         r += q.spef()
     mv = 2.44E-02*(0.4*dac - 0.1*q.getDAC(7))*5
-    print "%d %.2f %d" % (dac, mv, r)
+    print("%d %.2f %d" % (dac, mv, r))
 
 q.disableHV()
 q.s.close()

@@ -4,6 +4,7 @@ This script sets up mapping from stations to connections in the database
 
 Author: Bernhard Voigt <bernhard.voigt@desy.de>
 """
+from __future__ import print_function
 import time
 import sys
 from getopt import *
@@ -14,8 +15,7 @@ import MySQLdb
 ######################################
 
 def usage():
-    print >>sys.stderr, \
-          """
+    print("""
           Usage:
           dfl_station_calibration.py -H db-server -u db-user -p db-user-passwd -s site-name
                                      [-d date] calibration.txt
@@ -57,7 +57,7 @@ def usage():
 
           $
           
-          """
+          """, file=sys.stderr)
 
 
 ########################################
@@ -80,7 +80,7 @@ try:
                                 "H:u:p:s:d:vh")
 
 except GetoptError as e:
-    print e
+    print(e)
     usage()
     sys.exit(1)
     
@@ -106,9 +106,9 @@ for option, value in options:
 # and try to read it
 try:
     filename = arguments.pop()
-    f = file(filename, 'r')
+    f = open(filename, 'r')
 except Exception as e:
-    print >>sys.stderr, "Cannot open file %s" % filename
+    print("Cannot open file %s" % filename, file=sys.stderr)
     sys.exit(1)
 
 # create the database connection
@@ -136,19 +136,19 @@ for line in lines:
           WHERE fs.identifier=%s AND l.name=%s
           """
     if not cursor.execute(sql, (values[fields.index('STATION')], labName)):
-        print >>sys.stderr, "Cannot find the fat_station_id for station %s" % values[fields.index('STATION')]
+        print("Cannot find the fat_station_id for station %s" % values[fields.index('STATION')], file=sys.stderr)
     else:    
         stationId = cursor.fetchone()[0]
     
         sql = "INSERT INTO FAT_Station_Calibration VALUES (%s,%s,%s)"
         if verbose:
-            print >>sys.stderr, "Station %s: %s" % (values[fields.index('STATION')],
-                                                    (sql % (stationId, values[fields.index('RATIO')], date)))
+            print("Station %s: %s" % (values[fields.index('STATION')],
+                                                    (sql % (stationId, values[fields.index('RATIO')], date))), file=sys.stderr)
         if cursor.execute(sql, (stationId, values[fields.index('RATIO')], date)):
             counter += 1
 
 # done with looping and insertion        
 
-print "Inserted %d station calibration entries" % counter
+print("Inserted %d station calibration entries" % counter)
 
 sys.exit(0)

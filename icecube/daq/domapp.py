@@ -1,3 +1,5 @@
+from __future__ import print_function
+from builtins import object
 import os
 from sys import stderr
 from struct import pack, unpack
@@ -110,17 +112,17 @@ class MessagingException(Exception):
     def __str__(self):
         return "(%x,%x,%x,%x,%x,%x)" % unpack('>BBHHBB', self.msg)
         
-class DOMApp:
+class DOMApp(object):
     
     def __init__(self, card, pair, dom):
         self.card = card
         self.pair = pair
         self.dom  = dom
-        self.blksize = int(file(os.path.join(DRIVER_ROOT, "bufsiz")).read(100))
+        self.blksize = int(open(os.path.join(DRIVER_ROOT, "bufsiz")).read(100))
         self.fd = os.open("/dev/dhc%dw%dd%s" % (card, pair, dom), os.O_RDWR)
 
     def __del__(self):
-        print "destroying object"
+        print("destroying object")
         os.close(self.fd)
         
     def sendMsg(self, type, subtype, data="", msgid=0, status=0):
@@ -130,7 +132,7 @@ class DOMApp:
         buf  = os.read(self.fd, self.blksize)
         status, = unpack("B", buf[7])
         if status != 0x01:
-            print >>stderr, "Message Error: %s" % MessagingException(buf[0:8])
+            print("Message Error: %s" % MessagingException(buf[0:8]), file=stderr)
             # raise MessagingException(buf[0:8])
         return buf[8:]
 

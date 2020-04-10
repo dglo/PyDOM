@@ -1,19 +1,20 @@
-#!/bin/env python
+#!/usr/bin/env python
 
 """
 Turn on the light sources and run through the paces
 2004-08-27 K. Hanson (kael.hanson@icecube.wisc.edu)
 $Id: lux.py,v 1.8 2006/03/27 21:10:53 kael Exp $
 """
+from __future__ import print_function
 
+from builtins import range
 import sys, time, os
 from icecube.domtest.lightsource import pulser, Digikrom, FilterWheel
 from getopt import getopt
 
 
 def usage():
-    print >>sys.stderr, \
-"""
+    print("""
 USAGE
 
     lux.py [ options ]
@@ -26,7 +27,7 @@ Options are
     --monochromator-port=<port> (default=3011)
     --filter-wheel-port=<port>  (default=3012) specify which ports on lantronix to use
     
-"""
+""", file=sys.stderr)
 
 luxDir          = os.path.expanduser("~/monitoring")
 lantronixHost   = "lantronix"
@@ -57,7 +58,7 @@ for o, a in opts:
         usage()
         sys.exit(1)
 
-logf = file(os.path.expanduser(luxDir + "/" + "lux.log"), "a")
+logf = open(os.path.expanduser(luxDir + "/" + "lux.log"), "a")
 
 p    = pulser(lantronixHost, 3010)
 mono = Digikrom(lantronixHost, 3011)
@@ -72,7 +73,7 @@ mono.reset()
 time.sleep(5.0)
 
 
-print >>logf, "%.1f RUN BEGIN" % (time.time())
+print("%.1f RUN BEGIN" % (time.time()), file=logf)
 
 for pos in (1, 2, 3):
     fw.setPosition(pos)
@@ -87,7 +88,7 @@ for pos in (1, 2, 3):
     time.sleep(60.0)
     p.allOff()
     t1 = time.time()
-    print >>logf, "%.1f %.1f LASER FREQ %.1f FW %d" % (t0, t1, pulser_freq, pos)
+    print("%.1f %.1f LASER FREQ %.1f FW %d" % (t0, t1, pulser_freq, pos), file=logf)
     logf.flush()
 
     # Warm up the QTH lamp
@@ -108,7 +109,7 @@ for pos in (1, 2, 3):
         time.sleep(180.0)
         t1 = time.time()
         p.allOff()
-        print >>logf, "%.1f %.1f MONO ON LAMBDA %d FW %d" % (t0, t1, wavelength, pos)
+        print("%.1f %.1f MONO ON LAMBDA %d FW %d" % (t0, t1, wavelength, pos), file=logf)
         logf.flush()
 
-print >>logf, "%.1f RUN END" % (time.time())
+print("%.1f RUN END" % (time.time()), file=logf)

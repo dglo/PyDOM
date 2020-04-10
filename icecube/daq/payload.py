@@ -1,8 +1,12 @@
+from __future__ import absolute_import
 
+from builtins import str
+from builtins import range
+from builtins import object
 from struct import unpack
-from hits import domhit
-from slchit import DeltaCompressedHit as DCH
-from monitoring import MonitorRecordFactory
+from .hits import domhit
+from .slchit import DeltaCompressedHit as DCH
+from .monitoring import MonitorRecordFactory
 
 def indent(string, n):
     txt = ''
@@ -20,7 +24,7 @@ def recurse_triggers(tr):
 class PayloadException(Exception):
     pass
 
-class Payload:
+class Payload(object):
 
     def __init__(self, length, type, utime):
         self.length, self.type, self.utime = length, type, utime
@@ -98,10 +102,10 @@ class TriggerRequestPayload(Payload):
         txt += '--'
         return txt
 
-class ReadoutRequest:
+class ReadoutRequest(object):
     pass
 
-class ReadoutRequestElement:
+class ReadoutRequestElement(object):
     def __str__(self):
         return "[ReadoutRequestElement]: source=%s type=%d ival=(%d, %d)" % \
             (source_str(self.srcid), self.readout_type,

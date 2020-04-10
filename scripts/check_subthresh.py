@@ -2,6 +2,7 @@
 
 # Scan events for subthreshold hits
 
+from __future__ import print_function
 import sys
 from icecube.daq.payload import decode_payload
 from icecube.daq.subthresh import checkMissingReadouts
@@ -57,8 +58,8 @@ for filename in args:
         totevt += 1
         if checkMissingReadouts(evt):
             totsub += 1
-            if verbose: print evt.uid, evt.utime, evt.getTriggers()
+            if verbose: print(evt.uid, evt.utime, evt.getTriggers())
     if totevt == maxevt: break
 
-print totevt, totsub, "%.4g" % (float(totsub) / float(totevt))
+print(totevt, totsub, "%.4g" % (float(totsub) / float(totevt)))
  

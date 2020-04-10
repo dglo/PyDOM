@@ -2,11 +2,16 @@
 #
 # MonitorFile unit tests
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
 import unittest
 from icecube.domtest.DOMProdTestDB import DOMProdTestDB
 from icecube.domtest.MonitorFile import Monitor, MonData, MonitorFile
 from MockDB import MockDB, MockConnection, MockCursor
-import cStringIO
+import io
 
 class testMonitor(unittest.TestCase):
     """Unit tests for Monitor class"""
@@ -243,7 +248,7 @@ class testMonData(unittest.TestCase):
 
         mon.insert(dptDB, monId, dataId)
 
-class FakeData:
+class FakeData(object):
     def __init__(self, baseId):
         self.mbSerial = '%06x%06x' % (baseId, baseId + 16)
         self.maxTemp = baseId + 12.34
@@ -353,7 +358,7 @@ class testMonitorFile(unittest.TestCase):
         conn.verify()
 
     def testReadEmpty(self):
-        strIO = cStringIO.StringIO('')
+        strIO = io.StringIO('')
         results = MonitorFile.read(strIO, -12.3)
         self.failUnless(isinstance(results, Monitor),
                         'Expected MonitorFile.read() to return' +
@@ -369,7 +374,7 @@ class testMonitorFile(unittest.TestCase):
         temp = -2.46
 
         lcStr = self.buildMonStr(binSize, [baseId])
-        strIO = cStringIO.StringIO(lcStr)
+        strIO = io.StringIO(lcStr)
         results = MonitorFile.read(strIO, temp)
         self.failUnless(isinstance(results, Monitor),
                         'Expected MonitorFile.read() to return' +
@@ -388,7 +393,7 @@ class testMonitorFile(unittest.TestCase):
         temp = -2.46
 
         lcStr = self.buildMonStr(binSize, idList)
-        strIO = cStringIO.StringIO(lcStr)
+        strIO = io.StringIO(lcStr)
         results = MonitorFile.read(strIO, temp)
         self.failUnless(isinstance(results, Monitor),
                         'Expected MonitorFile.read() to return' +

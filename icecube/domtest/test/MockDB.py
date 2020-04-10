@@ -2,7 +2,12 @@
 #
 # Mock database interface
 
-class Warning(StandardError):
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from builtins import object
+from future.utils import raise_
+class Warning(Exception):
     """
     Exception raised for important warnings like data
     truncations while inserting, etc. It must be a subclass of
@@ -10,7 +15,7 @@ class Warning(StandardError):
     exceptions).
     """
 
-class Error(StandardError):
+class Error(Exception):
     """
     Exception that is the base class of all other error
     exceptions. You can use this to catch all errors with one
@@ -82,7 +87,7 @@ class NotSupportedError(DatabaseError):
     subclass of DatabaseError.
     """
 
-class MockCursor:
+class MockCursor(object):
     """
     These objects represent a database cursor, which is used to
     manage the context of a fetch operation. Cursors created from 
@@ -177,8 +182,8 @@ class MockCursor:
                     resultList.append(r)
                 else:
                     if self.debug:
-                        print "Fixing result type " + \
-                            str(type(r)) + " for result " + str(r)
+                        print("Fixing result type " + \
+                            str(type(r)) + " for result " + str(r))
                     resultList.append((r, ))
 
         if qStr not in self.queries:
@@ -198,7 +203,7 @@ class MockCursor:
             tmpList.append(resultList)
 
         if self.debug:
-            print self.name + ' QUERIES: ' + str(self.queries)
+            print(self.name + ' QUERIES: ' + str(self.queries))
 
     def verify(self):
         if len(self.queries) != 0:
@@ -206,12 +211,12 @@ class MockCursor:
                 plural = "y"
             else:
                 plural = "ies"
-            raise ProgrammingError, str(len(self.queries)) + \
-                " quer" + plural + " not used in MockCursor " + self.name
+            raise_(ProgrammingError, str(len(self.queries)) + \
+                " quer" + plural + " not used in MockCursor " + self.name)
 
         if not self.closed:
-            raise ProgrammingError, "MockCursor " + self.name + \
-                " was not closed"
+            raise_(ProgrammingError, "MockCursor " + self.name + \
+                " was not closed")
 
     def callproc(self, procname, *params):
         """
@@ -231,9 +236,9 @@ class MockCursor:
         """
 
         if self.closed:
-            raise ProgrammingError, "Cursor " + self.name + " is closed"
+            raise_(ProgrammingError, "Cursor " + self.name + " is closed")
 
-        raise Error, "Unimplemented"
+        raise Error("Unimplemented")
 
     def close(self):
         """
@@ -244,8 +249,8 @@ class MockCursor:
         """
 
         if self.closed:
-            raise ProgrammingError, "Cursor " + self.name + \
-                " has already been closed"
+            raise_(ProgrammingError, "Cursor " + self.name + \
+                " has already been closed")
 
         self.closed = True
 
@@ -279,28 +284,28 @@ class MockCursor:
         """
 
         if self.closed:
-            raise ProgrammingError, "Cursor " + self.name + " is closed"
+            raise_(ProgrammingError, "Cursor " + self.name + " is closed")
 
         if len(param) > 0:
-            raise ProgrammingError, "Too many parameters to execute()"
+            raise ProgrammingError("Too many parameters to execute()")
 
         if operation not in self.queries:
-            raise ProgrammingError, "Bad query '" + str(operation) + \
-                "' for MockCursor " + self.name
+            raise_(ProgrammingError, "Bad query '" + str(operation) + \
+                "' for MockCursor " + self.name)
 
         obj = self.queries[operation]
         if self.debug:
-            print "Q[" + operation + "] => " + str(obj)
+            print("Q[" + operation + "] => " + str(obj))
         if not isinstance(obj, list):
             self.activeResult = obj
             del self.queries[operation]
             if self.debug:
-                print "DEL Q[" + operation + "]"
+                print("DEL Q[" + operation + "]")
         else:
             self.activeResult = obj[0]
             del obj[0]
             if self.debug:
-                print "GOT Q[" + operation + "][0]"
+                print("GOT Q[" + operation + "][0]")
 
             if len(obj) == 0:
                 del self.queries[operation]
@@ -308,17 +313,17 @@ class MockCursor:
             elif len(obj) == 1:
                 self.queries[operation] = obj
                 if self.debug:
-                    print "NOW Q[" + operation + "] => " + \
-                        str(self.queries[operation])
+                    print("NOW Q[" + operation + "] => " + \
+                        str(self.queries[operation]))
 
         if self.activeResult is None:
             self.rowcount = 0
         else:
             if self.debug:
-                print "AR " + str(self.activeResult)
+                print("AR " + str(self.activeResult))
             self.rowcount = len(self.activeResult)
             if self.debug:
-                print "RC " + str(self.rowcount)
+                print("RC " + str(self.rowcount))
 
     def executemany(self, operation, *param):
         """
@@ -344,9 +349,9 @@ class MockCursor:
         """
 
         if self.closed:
-            raise ProgrammingError, "Cursor " + self.name + " is closed"
+            raise_(ProgrammingError, "Cursor " + self.name + " is closed")
 
-        raise Error, "Unimplemented"
+        raise Error("Unimplemented")
 
     def fetchone(self):
         """
@@ -360,7 +365,7 @@ class MockCursor:
         """
 
         if self.closed:
-            raise ProgrammingError, "Cursor " + self.name + " is closed"
+            raise_(ProgrammingError, "Cursor " + self.name + " is closed")
 
         if self.activeResult is None:
             return None
@@ -376,9 +381,9 @@ class MockCursor:
             del self.activeResult[0]
 
         if self.debug:
-            print 'FETCHONE => ' + str(result) + '(' + str(type(result)) + \
+            print('FETCHONE => ' + str(result) + '(' + str(type(result)) + \
                 ') [' + str(self.rowcount) + ' rows remain] ' + \
-                str(self.activeResult)
+                str(self.activeResult))
         return result
 
     def fetchmany(self, size=None):
@@ -407,12 +412,12 @@ class MockCursor:
         """
 
         if self.closed:
-            raise ProgrammingError, "Cursor " + self.name + " is closed"
+            raise_(ProgrammingError, "Cursor " + self.name + " is closed")
 
         if arraysize == None:
             arraysize = self.arraysize
 
-        raise Error, "Unimplemented"
+        raise Error("Unimplemented")
 
     def fetchall(self):
         """
@@ -427,10 +432,10 @@ class MockCursor:
         """
 
         if self.closed:
-            raise ProgrammingError, "Cursor " + self.name + " is closed"
+            raise_(ProgrammingError, "Cursor " + self.name + " is closed")
 
         if self.activeResult is None:
-            raise DataError, "No data found"
+            raise DataError("No data found")
 
         if self.rowcount == 0:
             return None
@@ -440,9 +445,9 @@ class MockCursor:
         self.activeResult = None
 
         if self.debug:
-            print 'FETCHALL => ' + str(result) + '(' + str(type(result)) + \
+            print('FETCHALL => ' + str(result) + '(' + str(type(result)) + \
                 ') [' + str(self.rowcount) + ' rows remain] ' + \
-                str(self.activeResult)
+                str(self.activeResult))
         return result
 
     def nextset(self):
@@ -465,9 +470,9 @@ class MockCursor:
         """
 
         if self.closed:
-            raise ProgrammingError, "Cursor " + self.name + " is closed"
+            raise_(ProgrammingError, "Cursor " + self.name + " is closed")
 
-        raise Error, "Unimplemented"
+        raise Error("Unimplemented")
 
     def setinputsizes(self, sizes):
         """
@@ -490,9 +495,9 @@ class MockCursor:
         """
 
         if self.closed:
-            raise ProgrammingError, "Cursor " + self.name + " is closed"
+            raise_(ProgrammingError, "Cursor " + self.name + " is closed")
 
-        raise Error, "Unimplemented"
+        raise Error("Unimplemented")
 
     def setoutputsizes(self, size, column=None):
         """
@@ -510,11 +515,11 @@ class MockCursor:
         """
 
         if self.closed:
-            raise ProgrammingError, "Cursor " + self.name + " is closed"
+            raise_(ProgrammingError, "Cursor " + self.name + " is closed")
 
-        raise Error, "Unimplemented"
+        raise Error("Unimplemented")
 
-class MockConnection:
+class MockConnection(object):
     def __init__(self):
         self.cursorList = []
         self.usedList = []
@@ -527,7 +532,7 @@ class MockConnection:
 
     def addCursor(self, cursor):
         if self.debug:
-            print "ADD CURSOR " + str(cursor)
+            print("ADD CURSOR " + str(cursor))
         self.cursorList.append(cursor)
 
     def verify(self):
@@ -537,16 +542,16 @@ class MockConnection:
                 verb = " was"
             else:
                 verb = "s were"
-            raise ProgrammingError, str(len(self.cursorList)) + \
+            raise_(ProgrammingError, str(len(self.cursorList)) + \
                 " statement" + verb + " not used (" + str(self.cursorList) + \
-                ')'
+                ')')
 
         for c in self.usedList:
             c.verify()
 
         if self.expectedClose != self.actualClose:
-            raise ProgrammingError, "Expected " + str(self.expectedClose) + \
-                " close(), got " + str(self.actualClose)
+            raise_(ProgrammingError, "Expected " + str(self.expectedClose) + \
+                " close(), got " + str(self.actualClose))
 
     def close(self):
         """
@@ -571,7 +576,7 @@ class MockConnection:
         Database modules that do not support transactions should
         implement this method with void functionality.
         """
-        raise Error, "Unimplemented"
+        raise Error("Unimplemented")
 
     def rollback(self):
         """
@@ -584,7 +589,7 @@ class MockConnection:
         committing the changes first will cause an implicit
         rollback to be performed.
         """
-        raise Error, "Unimplemented"
+        raise Error("Unimplemented")
 
     def cursor(self):
         """
@@ -594,17 +599,17 @@ class MockConnection:
         the extent needed by this specification.
         """
         if len(self.cursorList) == 0:
-            raise ProgrammingError, "No cursors remaining"
+            raise ProgrammingError("No cursors remaining")
 
         cursor = self.cursorList[0]
         del self.cursorList[0]
         if self.debug:
-            print "USE CURSOR " + str(cursor)
+            print("USE CURSOR " + str(cursor))
         self.usedList.append(cursor)
 
         return cursor
 
-class MockDB:
+class MockDB(object):
     def __init__(self):
         # apilevel:
         #   String constant stating the supported DB API level.
@@ -651,7 +656,7 @@ class MockDB:
         Returns a Connection Object. It takes a number of
         parameters which are database dependent.
         """
-        raise Error, "Unimplemented"
+        raise Error("Unimplemented")
 
 if __name__ == '__main__':
     sys.exit(1)

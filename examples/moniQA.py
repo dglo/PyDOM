@@ -1,5 +1,7 @@
-#!/bin/env python
+#!/usr/bin/env python
 
+from __future__ import print_function
+from builtins import range
 import sys
 from pickle import load
 from icecube.domtest.payload import decode_payload
@@ -12,13 +14,13 @@ def sum(lx):
 
 args = sys.argv[1:]
 domdb = args.pop(0)
-doms = load(file(domdb, 'r'))
+doms = load(open(domdb, 'r'))
 db   = dict()
 for d in doms: db[d[0]] = d
 
 monitoring = dict()
 while len(args) > 0:
-    f = file(args.pop(0), 'rb')
+    f = open(args.pop(0), 'rb')
     while True:
         mp = decode_payload(f)
         if mp is None: break
@@ -29,7 +31,7 @@ while len(args) > 0:
             monitoring[domid].append(mp.rec)
                 
 # Summarize stats
-domids = monitoring.keys()
+domids = list(monitoring.keys())
 
 for string in range(1, 81):
     onstr = [ int(domid[3:5]) for domid in domids if int(domid[0:2]) == string ]
@@ -56,7 +58,7 @@ for domid in sorted(domids):
     else:
         avgsperate = 0.0
         avgmperate = 0.0
-    print domid, '%.1f %.1f' % (avgsperate, avgmperate)
+    print(domid, '%.1f %.1f' % (avgsperate, avgmperate))
     #print domid, n, '%.3f' % t0, '%.3f' % t1, '%.3f' % t2, '%.3f' % t3,\
     #    '%.1f' % (n / (t2 - t0)), '(%.1f:%.1f)' % (avgsperate, avgmperate)
     

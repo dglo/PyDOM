@@ -1,15 +1,21 @@
-#!/bin/env python
+#!/usr/bin/env python
 """
 Digitial Optical Module mainboard analog front-end calibration script.
 $Id: domcal.py,v 1.11 2006/02/15 21:13:13 kael Exp $
 """
+from __future__ import print_function
+from __future__ import absolute_import
 
-import ibidaq as daq
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
+from . import ibidaq as daq
 import time
 import getopt
 import os
 import sys
-from urllib import urlopen
+from urllib.request import urlopen
 from xml.dom.minidom import parse
 from numpy import array, zeros, sum, concatenate
 from math import sqrt
@@ -41,7 +47,7 @@ def hunt(q, alo, ahi):
         time.sleep(0.25)
         rate = q.spef()
         if debug_level > 3:
-            print "hunt(): %d %d %d %d %d" % (q.getDAC(9), alo, ahi, amp, rate)
+            print("hunt(): %d %d %d %d %d" % (q.getDAC(9), alo, ahi, amp, rate))
         if rate > 3900:
             ahi = amp
         else:
@@ -59,7 +65,7 @@ def meanvar(x):
     var /= len(x)
     return mean, var
 
-class atwd_calconst:
+class atwd_calconst(object):
     """ATWD Calibration DataStructure."""
     def __init__(self, slope_array, int_array, r_array):
         self.slope = slope_array
@@ -80,7 +86,7 @@ def _getNodeText(nodes):
 def _parseADCDAC(node):
     return int(node.getAttribute("channel")), int(_getNodeText(node.childNodes))
 
-class Fit:
+class Fit(object):
     """
     Fit data class.
     """
@@ -110,12 +116,12 @@ class Fit:
 
     def toXML(self, f):
         f.write(' '*8 + '<fit model="%s">\n' % (self.model))
-        for p in self.param.items():
+        for p in list(self.param.items()):
             f.write(' '*12 + '<param name="%s">%.6g</param>\n' % p)
         f.write(' '*12 + '<regression-coeff>%.6g</regression-coeff>\n' % (self.r))
         f.write(' '*8 + '</fit>\n')
     
-class calibrator:
+class calibrator(object):
     """
     DOM Analog FE Calibration class.
     Class public data:
@@ -294,7 +300,7 @@ class calibrator:
                 self.atwd_fit[ch][bin].toXML(fxml)
                 fxml.write('    </atwd>\n')
 
-        for fpr in self.fadcpar.items():
+        for fpr in list(self.fadcpar.items()):
             fxml.write("    <fadc parname='%s' value='%.6g'/>\n" % fpr)
             
         for ch in range(3):
@@ -360,11 +366,11 @@ class calibrator:
             time.sleep(0.25)
             d = q.spef()
             if debug_level > 2:
-                print "calibrator::pulsercal()%d %d %d %d %d" % (disc, a, b, c, d)
+                print("calibrator::pulsercal()%d %d %d %d %d" % (disc, a, b, c, d))
             if c < 3900 and d > 3900:
                 x = (b - a) / float(d - c) * float(3900 - c) + a
                 if debug_level > 2:
-                    print "%d %d %d %d %d %.2f" % (disc, a, b, c, d, x)
+                    print("%d %d %d %d %d %.2f" % (disc, a, b, c, d, x))
                 mv = 2.44E-05*(0.4*disc-0.1*bias)*5
                 thresh.append(mv)
                 pulse.append(x)
@@ -408,10 +414,10 @@ class calibrator:
             for bin in range(128):
                 v = []
                 a = []
-                for bias, vec in scan.items():
+                for bias, vec in list(scan.items()):
                     v.append(bias * 5.0 / 4096.0)
                     a.append(vec[ch][bin])
-                    # f = file('debug/atwd-a-%d-%d.vec' % (ch, bin), 'wt')
+                    # f = open('debug/atwd-a-%d-%d.vec' % (ch, bin), 'wt')
                     # for pair in zip(a,v):
                     #    f.write("%.2f %.2f\n" % pair)
                     # f.close()
@@ -479,7 +485,7 @@ class calibrator:
 if __name__ == "__main__":
 
     if len(sys.argv) < 3:
-        print """usage: domcal <host> <port> <dir>"""
+        print("""usage: domcal <host> <port> <dir>""")
         sys.exit(1)
         
     host = sys.argv[1]
@@ -502,12 +508,12 @@ if __name__ == "__main__":
 
     del(q)
 
-    fxml = file(calfile, "wt")
+    fxml = open(calfile, "wt")
     cal.toXML(fxml)
     fxml.close()
 
     # Write out filename to communicate back to parent process
-    print calfile
+    print(calfile)
 
 
 

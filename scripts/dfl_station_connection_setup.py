@@ -4,7 +4,9 @@ This script sets up mapping from stations to connections in the database
 
 Author: Bernhard Voigt <bernhard.voigt@desy.de>
 """
+from __future__ import print_function
 
+from builtins import str
 import icecube.domtest.fatsetup as fatsetup
 import re
 import sys
@@ -24,8 +26,7 @@ else:
 ######################################
 
 def usage():
-    print >>sys.stderr, \
-          """
+    print("""
           Usage:
           dfl_station_connection_setup.py -H db-server -u db-user -p db-user-passwd -s site-name
                                           --breakoutbox BREAKOUTBOX.CONNECTER DOMHUB.CARDWIREDOM STATION_IDENTIFIER
@@ -63,7 +64,7 @@ def usage():
 
           dfl_station_connection_setup.py -H dbsever -u user -p passwd -s DESY --breakoutbox 4.2 domhub3.20A 6
 
-          """
+          """, file=sys.stderr)
 
 def prompt(string, validItems=None):
     """
@@ -111,7 +112,7 @@ try:
                                 ['breakoutbox='])
 
 except GetoptError as e:
-    print e
+    print(e)
     usage()
     sys.exit(1)
 
@@ -172,10 +173,10 @@ if stationIdentifier is not None and domhub is not None:
         if userInput == 'y':
             try:
                 stationId = fatsetup.insertStation(db, labName, stationIdentifier)
-                print "Station %s created!" % stationIdentifier
+                print("Station %s created!" % stationIdentifier)
             except Exception as e:
-                print e
-                print >>sys.stderr, "Could not insert the Station into the database!"
+                print(e)
+                print("Could not insert the Station into the database!", file=sys.stderr)
                 sys.exit(1)
 
 
@@ -196,20 +197,20 @@ if stationIdentifier is not None and domhub is not None:
             try:
                 connectionId = fatsetup.insertConnection(db, labName, domhub, dorCard, wirePair,
                                                          wirePosition, breakoutbox, breakoutboxConnector)
-                print "Connection %s.%s%s%s created!" % (domhub, dorCard, wirePair, wirePosition)
+                print("Connection %s.%s%s%s created!" % (domhub, dorCard, wirePair, wirePosition))
             except Exception as e:
-                print e
-                print >>sys.stderr, "Could not insert the connection into the database!"
+                print(e)
+                print("Could not insert the connection into the database!", file=sys.stderr)
                 sys.exit(1)
 
     try:
         fatsetup.mapStationToConnection(db, stationId, connectionId)
-        print "Mapped station %s to connection %s.%s%s%s" % (stationIdentifier, domhub, dorCard, wirePair, wirePosition)
+        print("Mapped station %s to connection %s.%s%s%s" % (stationIdentifier, domhub, dorCard, wirePair, wirePosition))
 
     except Exception as e:
-        print e
-        print >>sys.stderr, "Could not map station %s to connection %s.%s%s%s" % \
-              (stationIdentifier, domhub, dorCard, wirePair, wirePosition)
+        print(e)
+        print("Could not map station %s to connection %s.%s%s%s" % \
+              (stationIdentifier, domhub, dorCard, wirePair, wirePosition), file=sys.stderr)
         sys.exit(1)
 
 if printMapping:

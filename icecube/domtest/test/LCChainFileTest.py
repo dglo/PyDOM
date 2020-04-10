@@ -2,11 +2,15 @@
 #
 # LCChainFile unit tests
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 import unittest
 from icecube.domtest.DOMProdTestDB import DOMProdTestDB
 from icecube.domtest.LCChainFile import TestResult, LCChainFile
 from MockDB import MockDB, MockConnection, MockCursor
-import cStringIO
+import io
 
 class testTestResult(unittest.TestCase):
     """Unit tests for TestResult class"""
@@ -179,7 +183,7 @@ class testLCChainFile(unittest.TestCase):
         conn.verify()
 
     def testReadEmpty(self):
-        strIO = cStringIO.StringIO('')
+        strIO = io.StringIO('')
         results = LCChainFile.read(strIO)
         self.failUnless(isinstance(results, list),
                         'Expected LCChainFile.read() to return a list')
@@ -196,7 +200,7 @@ class testLCChainFile(unittest.TestCase):
 
         lcStr = self.buildLCStr('hub', '01A', '01B', hiDOM, loDOM,
                                 dnNeg, dnPos, upNeg, upPos)
-        strIO = cStringIO.StringIO(lcStr)
+        strIO = io.StringIO(lcStr)
         results = LCChainFile.read(strIO)
         self.failUnless(isinstance(results, list),
                         'Expected LCChainFile.read() to return a list')
@@ -225,7 +229,7 @@ class testLCChainFile(unittest.TestCase):
                                             hiDOM[i], loDOM[i], dnNeg[i],
                                             dnPos[i], upNeg[i], upPos[i])
 
-        strIO = cStringIO.StringIO(lcStr)
+        strIO = io.StringIO(lcStr)
         results = LCChainFile.read(strIO)
         self.failUnless(isinstance(results, list),
                         'Expected LCChainFile.read() to return a list')

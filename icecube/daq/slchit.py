@@ -2,10 +2,15 @@
 Module for compressed hit formats
 """
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
 from struct import unpack
-from cStringIO import StringIO
+from io import StringIO
 
-class SLCHit:
+class SLCHit(object):
     """
     The SLCHit class handles Soft Local Coincidence
     hits - that is, it is the base class for compressed
@@ -80,7 +85,7 @@ class DeltaCompressedHit(SLCHit):
                 self.atwd[i] = codec.decode(128)
         self.decoded = True
         
-class delta_codec:
+class delta_codec(object):
     def __init__(self, buf):
         self.tape = StringIO(buf)
         self.valid_bits = 0
